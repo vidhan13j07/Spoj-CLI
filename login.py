@@ -2,13 +2,19 @@ import sys
 import getpass
 import os
 import re
-from bs4 import BeautifulSoup
+
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    print "Install BeautifulSoup"
+    sys.exit(1)
 
 try:
     import requests
 except ImportError:
-    print "Install requests"
+    print "Install requests module"
     sys.exit(1)
+
 
 def first_time_login():
     name = raw_input("Enter your spoj username: ")
@@ -17,8 +23,9 @@ def first_time_login():
         f.write(name + "\n" + password)
     return name,password
 
+
 def start_session(url, username, password):
-    print ('Verifing..')
+    print ('Verifying..')
     with requests.Session() as session:
         payload = {
             'login_user' : username,
@@ -38,7 +45,12 @@ def start_session(url, username, password):
                 start_session(url, name, p)
                 break
         else:
-            print ('Authentication Passed!')
+            r = session.get('http://www.spoj.com/myaccount/')
+            html = str(r.text)
+            soup = BeautifulSoup(html, 'html.parser')
+
+            read_submitted_problems(soup)
+            read_todo_problems(soup)
 
 
 def credentials(url):
@@ -51,6 +63,31 @@ def credentials(url):
         username,password = first_time_login()
 
     start_session(url, username, password)
+
+
+def read_submitted_problems(soup):
+    tables = soup.find_all('table')
+
+    global submitted_problems, submitted_problem_links
+    submitted_problems,submitted_problem_links = [],[]
+
+    for row in tables[0].find_all('tr'):
+        for col in row.find_all('a'):
+            submitted_problems.append(col.get_text())
+            submitted_problem_links.append(col.get('href'))
+
+
+def read_todo_problems(soup):
+    tables = soup.find_all('table')
+
+    global todo_problems, todo_problem_links
+    todo_problems,todo_problem_links = [],[]
+
+    for row in tables[1].find_all('tr'):
+        for col in row.find_all('a'):
+            todo_problems.append(col.get_text())
+            todo_problem_links.append(col.get('href'))
+
 
 def main():
     url = "http://www.spoj.com/login"
