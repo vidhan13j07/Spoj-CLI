@@ -2,17 +2,18 @@ import sys
 import getpass
 import os
 import re
+import bz2
 
 try:
     from bs4 import BeautifulSoup
 except ImportError:
-    print "Install BeautifulSoup"
+    print ("Install BeautifulSoup")
     sys.exit(1)
 
 try:
     import requests
 except ImportError:
-    print "Install requests module"
+    print ("Install requests module")
     sys.exit(1)
 
 
@@ -20,11 +21,11 @@ def first_time_login():
     name = raw_input("Enter your spoj username: ")
     password = getpass.getpass()
     with file('.passd.txt', 'w') as f:
-        f.write(name + "\n" + password)
+        f.write(bz2.compress(name) + "\n" + bz2.compress(password))
     return name,password
 
 
-def start_session(url, username, password):
+def start_session(login_url, username, password):
     print ('Verifying..')
     with requests.Session() as session:
         payload = {
@@ -32,7 +33,7 @@ def start_session(url, username, password):
             'password' : password,
             'submit': 'login',
         }
-        r = session.post(url, data = payload)
+        r = session.post(login_url, data = payload)
 
         html = r.text
         html.encode('utf-8')
@@ -40,7 +41,7 @@ def start_session(url, username, password):
         for auth in soup.find_all('h3'):
             if (auth.get_text() == 'Authentication failed!'):
                 print ('Authentication Failed!')
-                print ('Enter login credentials!')
+                print ('Enter login credentials again!')
                 name,p = first_time_login()
                 start_session(url, name, p)
                 break
@@ -52,17 +53,16 @@ def start_session(url, username, password):
             read_submitted_problems(soup)
             read_todo_problems(soup)
 
-
-def credentials(url):
+def login_credentials(login_url):
     if (os.path.isfile('.passd.txt')):
         f = open('.passd.txt','r')
         username,password = f.readlines()
-        username = username.strip()
-        password = password.strip()
+        username = bz2.decompress(username)
+        password = bz2.decompress(password)
     else:
         username,password = first_time_login()
 
-    start_session(url, username, password)
+    start_session(login_url, username, password)
 
 
 def read_submitted_problems(soup):
@@ -89,9 +89,10 @@ def read_todo_problems(soup):
             todo_problem_links.append(col.get('href'))
 
 
+
 def main():
-    url = "http://www.spoj.com/login"
-    credentials(url)
+    login_url = "http://www.spoj.com/login"
+    login_credentials(login_url)
 
 
 if __name__ == '__main__':
