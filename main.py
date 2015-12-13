@@ -27,6 +27,7 @@ def first_time_login():
 
 def start_session(login_url, username, password):
     print ('Verifying..')
+    global session
     with requests.Session() as session:
         payload = {
                 'login_user' : username,
@@ -105,6 +106,9 @@ def show_problems():
                 9. Exit'
 
     choice = int(raw_input())
+
+    star()
+
     options = { 1 : classical_problems,
                 2 : challenge_problems,
                 3 : partial_problems,
@@ -120,35 +124,56 @@ def show_problems():
         print ('Wrong choice! Enter Again.')
         show_problems()
 
-    star()
-
 def classical_problems():
-    url = 'http://www.spoj.com/problems/classical/'
+    url1 = url + '/problems/classical/'
     pass
 
 def challenge_problems():
-    url = 'http://www.spoj.com/problems/challenge/'
+    url1 = url + '/problems/challenge/'
     pass
 
 def partial_problems():
-    url = 'http://www.spoj.com/problems/partial/'
+    url1 = url + '/problems/partial/'
     pass
 
 def tutorial_problems():
-    url = 'http://www.spoj.com/problems/tutorial/'
+    url1 = url + '/problems/tutorial/'
     pass
 
 def riddle_problems():
-    url = 'http://www.spoj.com/problems/riddle/'
+    url1 = url + '/problems/riddle/'
     pass
 
 def basic_problems():
-    url = 'http://www.spoj.com/problems/basics/'
+    url1 = url + '/problems/basics/'
     pass
 
 def problem_by_tags():
-    url = 'http://www.spoj.com/problems/tags'
-    pass
+    tags_url = url + '/problems/tags'
+    r = session.get(tags_url)
+    html = str(r.text)
+    soup = BeautifulSoup(html, 'html.parser')
+
+    rows = soup.find('table').find('tbody').find_all('tr')
+    tags,tag_links,count = [],[],[]
+
+    for columns in rows:
+        col = columns.find_all('td')
+        cnt = int(col[1].get_text())
+        if(cnt > 0):
+            link = col[0].find('a')
+            tags.append(link.get_text())
+            tag_links.append(link.get('href'))
+            count.append(cnt)
+
+    print ('{:<40}{:<50}{:<40}\n\n'.format('INDEX','TAGS','PROBLEMS'))
+    display(tags, count)
+
+
+def display(tags, count):
+    for index,tgs in enumerate(tags):
+        print ('{:<40}{:<50}{:<40}\n'.format(index+1,tgs,count[index]))
+    star()
 
 def submit_solution():
     pass
@@ -173,10 +198,12 @@ def read_from_user():
 
 def star():
     print
-    print '*'*100
+    print '*'*150
     print
 
 def main():
+    global url
+    url = "http://www.spoj.com"
     login_url = "http://www.spoj.com/login"
     login_credentials(login_url)
 
