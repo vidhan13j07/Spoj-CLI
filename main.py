@@ -29,10 +29,10 @@ def start_session(login_url, username, password):
     print ('Verifying..')
     with requests.Session() as session:
         payload = {
-            'login_user' : username,
-            'password' : password,
-            'submit': 'login',
-        }
+                'login_user' : username,
+                'password' : password,
+                'submit': 'login',
+                }
         r = session.post(login_url, data = payload)
 
         html = r.text
@@ -53,12 +53,15 @@ def start_session(login_url, username, password):
             read_submitted_problems(soup)
             read_todo_problems(soup)
 
+            read_from_user()
+
 def login_credentials(login_url):
     if (os.path.isfile('.passd.txt')):
         f = open('.passd.txt','r')
         username,password = f.readlines()
         username = bz2.decompress(username)
         password = bz2.decompress(password)
+        f.close()
     else:
         username,password = first_time_login()
 
@@ -88,7 +91,90 @@ def read_todo_problems(soup):
             todo_problems.append(col.get_text())
             todo_problem_links.append(col.get('href'))
 
+def show_problems():
+    star()
 
+    print '\t\t1. Classical\n\
+                2. Challenge\n\
+                3. Partial\n\
+                4. Tutorial\n\
+                5. Riddle\n\
+                6. Basics\n\
+                7. Problem by tags\n\
+                8. Back\n\
+                9. Exit'
+
+    choice = int(raw_input())
+    options = { 1 : classical_problems,
+                2 : challenge_problems,
+                3 : partial_problems,
+                4 : tutorial_problems,
+                5 : riddle_problems,
+                6 : basic_problems,
+                7 : problem_by_tags,
+                8 : read_from_user,
+              }
+    if (choice >= 1 and choice <=8):
+        options[choice]()
+    elif (choice != 9):
+        print ('Wrong choice! Enter Again.')
+        show_problems()
+
+    star()
+
+def classical_problems():
+    url = 'http://www.spoj.com/problems/classical/'
+    pass
+
+def challenge_problems():
+    url = 'http://www.spoj.com/problems/challenge/'
+    pass
+
+def partial_problems():
+    url = 'http://www.spoj.com/problems/partial/'
+    pass
+
+def tutorial_problems():
+    url = 'http://www.spoj.com/problems/tutorial/'
+    pass
+
+def riddle_problems():
+    url = 'http://www.spoj.com/problems/riddle/'
+    pass
+
+def basic_problems():
+    url = 'http://www.spoj.com/problems/basics/'
+    pass
+
+def problem_by_tags():
+    url = 'http://www.spoj.com/problems/tags'
+    pass
+
+def submit_solution():
+    pass
+
+def read_from_user():
+    star()
+
+    print '\t\t1. Show problems\n\
+                2. Submit solution\n\
+                3. Show submitted problems by the user\n\
+                4. Download all solutions to submitted problems by user\n\
+                5. Exit'
+
+    choice = int(raw_input())
+    if (choice == 1):
+        show_problems()
+    elif (choice == 2):
+        submit_solution()
+    elif (choice != 5):
+        print ('Wrong choice! Enter Again.')
+        read_from_user()
+
+def star():
+    print
+    print '*'*100
+    print
 
 def main():
     login_url = "http://www.spoj.com/login"
