@@ -23,6 +23,7 @@ def first_time_login():
     name = raw_input("Enter your spoj username: ")
     password = getpass.getpass()
     # When the user logins for the first time, his username and password gets stored in the file in encrypted format.
+    # On next login, this username and password is retrieved from file and used.
     compressed = bz2.compress((name + ',' + password).encode('utf-8'))
     with open('.passd.txt', 'wb') as f:
         f.write(compressed)
@@ -54,9 +55,10 @@ def start_session(login_url, username, password):
             r = session.get('http://www.spoj.com/myaccount/')
             html = str(r.text)
             soup = BeautifulSoup(html, 'html.parser')
-
-            read_submitted_problems(soup)
-            read_todo_problems(soup)
+            tables = soup.find_all('table')
+            global submitted_problems,todo_problems
+            submitted_problems = read_problems(tables[0])
+            todo_problems = read_problems(tables[1])
 
             read_from_user()
 
@@ -69,27 +71,13 @@ def login_credentials(login_url):
 
     start_session(login_url, username, password)
 
-def read_submitted_problems(soup):
-    tables = soup.find_all('table')
-
-    global submitted_problems
-    submitted_problems = []
-
-    for row in tables[0].find_all('tr'):
+def read_problems(table):
+    problems = []
+    for row in table.find_all('tr'):
         for col in row.find_all('a'):
             if (col.get_text()):
-                submitted_problems.append((col.get_text(), col.get('href')))
-
-def read_todo_problems(soup):
-    tables = soup.find_all('table')
-
-    global todo_problems
-    todo_problems = []
-
-    for row in tables[1].find_all('tr'):
-        for col in row.find_all('a'):
-            if (col.get_text()):
-                todo_problems.append((col.get_text(), col.get('href')))
+                problems.append((col.get_text(), col.get('href')))
+    return problems
 
 def show_problems():
     star()
