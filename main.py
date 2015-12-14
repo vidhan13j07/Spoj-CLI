@@ -16,12 +16,15 @@ except ImportError:
     print ("Install requests module")
     sys.exit(1)
 
+if (sys.version_info > (3,0)):
+    raw_input = input
 
 def first_time_login():
     name = raw_input("Enter your spoj username: ")
     password = getpass.getpass()
-    with file('.passd.txt', 'w') as f:
-        f.write(bz2.compress(name) + "\n" + bz2.compress(password))
+    compressed = bz2.compress((name + ',' + password).encode('utf-8'))
+    with open('.passd.txt', 'wb') as f:
+        f.write(compressed)
     return name,password
 
 
@@ -58,16 +61,12 @@ def start_session(login_url, username, password):
 
 def login_credentials(login_url):
     if (os.path.isfile('.passd.txt')):
-        f = open('.passd.txt','r')
-        username,password = f.readlines()
-        username = bz2.decompress(username)
-        password = bz2.decompress(password)
-        f.close()
+        with open('.passd.txt','rb') as f:
+            username,password = bz2.decompress(f.read()).decode('utf-8').split(',')
     else:
         username,password = first_time_login()
 
     start_session(login_url, username, password)
-
 
 def read_submitted_problems(soup):
     tables = soup.find_all('table')
@@ -95,7 +94,7 @@ def read_todo_problems(soup):
 def show_problems():
     star()
 
-    print '\t\t1. Classical\n\
+    print ('\t\t1. Classical\n\
                 2. Challenge\n\
                 3. Partial\n\
                 4. Tutorial\n\
@@ -103,7 +102,7 @@ def show_problems():
                 6. Basics\n\
                 7. Problem by tags\n\
                 8. Back\n\
-                9. Exit'
+                9. Exit')
 
     choice = int(raw_input())
 
@@ -160,7 +159,7 @@ def problem_by_tags():
     for columns in rows:
         col = columns.find_all('td')
         cnt = int(col[1].get_text())
-        if(cnt > 0):
+        if (cnt > 0):
             link = col[0].find('a')
             tags.append(link.get_text())
             tag_links.append(link.get('href'))
@@ -181,11 +180,11 @@ def submit_solution():
 def read_from_user():
     star()
 
-    print '\t\t1. Show problems\n\
+    print ('\t\t1. Show problems\n\
                 2. Submit solution\n\
                 3. Show submitted problems by the user\n\
                 4. Download all solutions to submitted problems by user\n\
-                5. Exit'
+                5. Exit')
 
     choice = int(raw_input())
     if (choice == 1):
@@ -197,9 +196,7 @@ def read_from_user():
         read_from_user()
 
 def star():
-    print
-    print '*'*150
-    print
+    print ('\n' + '*'*150 + '\n')
 
 def main():
     global url
