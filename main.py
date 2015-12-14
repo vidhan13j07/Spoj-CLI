@@ -22,6 +22,7 @@ if (sys.version_info > (3,0)):
 def first_time_login():
     name = raw_input("Enter your spoj username: ")
     password = getpass.getpass()
+    # When the user logins for the first time, his username and password gets stored in the file in encrypted format.
     compressed = bz2.compress((name + ',' + password).encode('utf-8'))
     with open('.passd.txt', 'wb') as f:
         f.write(compressed)
@@ -29,7 +30,7 @@ def first_time_login():
 
 
 def start_session(login_url, username, password):
-    print ('Verifying..')
+    print ('Verifying....')
     global session
     with requests.Session() as session:
         payload = {
@@ -38,10 +39,10 @@ def start_session(login_url, username, password):
                 'submit': 'login',
                 }
         r = session.post(login_url, data = payload)
-
         html = r.text
         html.encode('utf-8')
         soup = BeautifulSoup(html, 'html.parser')
+
         for auth in soup.find_all('h3'):
             if (auth.get_text() == 'Authentication failed!'):
                 print ('Authentication Failed!')
@@ -71,25 +72,24 @@ def login_credentials(login_url):
 def read_submitted_problems(soup):
     tables = soup.find_all('table')
 
-    global submitted_problems, submitted_problem_links
-    submitted_problems,submitted_problem_links = [],[]
+    global submitted_problems
+    submitted_problems = []
 
     for row in tables[0].find_all('tr'):
         for col in row.find_all('a'):
-            submitted_problems.append(col.get_text())
-            submitted_problem_links.append(col.get('href'))
-
+            if (col.get_text()):
+                submitted_problems.append((col.get_text(), col.get('href')))
 
 def read_todo_problems(soup):
     tables = soup.find_all('table')
 
-    global todo_problems, todo_problem_links
-    todo_problems,todo_problem_links = [],[]
+    global todo_problems
+    todo_problems = []
 
     for row in tables[1].find_all('tr'):
         for col in row.find_all('a'):
-            todo_problems.append(col.get_text())
-            todo_problem_links.append(col.get('href'))
+            if (col.get_text()):
+                todo_problems.append((col.get_text(), col.get('href')))
 
 def show_problems():
     star()
@@ -154,24 +154,27 @@ def problem_by_tags():
     soup = BeautifulSoup(html, 'html.parser')
 
     rows = soup.find('table').find('tbody').find_all('tr')
-    tags,tag_links,count = [],[],[]
+
+    tags = []   #tags is list of tuples in format (tag name, count of problems, tag link)
 
     for columns in rows:
         col = columns.find_all('td')
         cnt = int(col[1].get_text())
         if (cnt > 0):
             link = col[0].find('a')
-            tags.append(link.get_text())
-            tag_links.append(link.get('href'))
-            count.append(cnt)
+            tags.append((link.get_text(), cnt, link.get('href')))
 
-    print ('{:<40}{:<50}{:<40}\n\n'.format('INDEX','TAGS','PROBLEMS'))
-    display(tags, count)
+    print ('{:<40}||{:^50}||{:>40}\n\n'.format('INDEX', 'TAGS', 'PROBLEMS'))
+    display2(tags)
 
+def display(tup):
+    for index,p in enumerate(tup):
+        print ('{:<30}||{:>30}\n'.format(index+1, p[0]))
+    star()
 
-def display(tags, count):
-    for index,tgs in enumerate(tags):
-        print ('{:<40}{:<50}{:<40}\n'.format(index+1,tgs,count[index]))
+def display2(tup):
+    for index,p in enumerate(tup):
+        print ('{:<40}||{:^50}||{:>40}\n'.format(index+1 ,p[0] ,p[1]))
     star()
 
 def submit_solution():
@@ -183,15 +186,24 @@ def read_from_user():
     print ('\t\t1. Show problems\n\
                 2. Submit solution\n\
                 3. Show submitted problems by the user\n\
-                4. Download all solutions to submitted problems by user\n\
-                5. Exit')
+                4. Show todo problems\n\
+                5. Download all solutions to submitted problems by user\n\
+                6. Exit')
 
     choice = int(raw_input())
     if (choice == 1):
         show_problems()
     elif (choice == 2):
         submit_solution()
-    elif (choice != 5):
+    elif (choice == 3):
+        star()
+        print ('\n{:<30}||{:>30}\n'.format("INDEX", "PROBLEM"))
+        display(submitted_problems)
+    elif (choice == 4):
+        star()
+        print ('\n{:<30}{:>30}\n'.format("INDEX", "PROBLEM"))
+        display(todo_problems)
+    elif (choice != 6):
         print ('Wrong choice! Enter Again.')
         read_from_user()
 
