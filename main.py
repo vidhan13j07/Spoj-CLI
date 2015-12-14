@@ -77,7 +77,8 @@ def read_problems(table):
         for col in row.find_all('a'):
             if (col.get_text()):
                 problems.append((col.get_text(), col.get('href')))
-    return problems
+    # Strip out empty tuples
+    return filter(lambda x: x[0], problems)
 
 def show_problems():
     star()
