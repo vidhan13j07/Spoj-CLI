@@ -48,8 +48,7 @@ def start_session(login_url, username, password):
                 break
         else:
             r = session.get('http://www.spoj.com/myaccount/')
-            html = str(r.text)
-            soup = BeautifulSoup(html, 'html.parser')
+            soup = BeautifulSoup(r.text, 'html.parser')
             tables = soup.find_all('table')
             global submitted_problems,todo_problems
             submitted_problems = read_problems(tables[0])
@@ -70,8 +69,7 @@ def read_problems(table):
     problems = []
     for row in table.find_all('tr'):
         for col in row.find_all('a'):
-            if (col.get_text()):
-                problems.append((col.get_text(), col.get('href')))
+            problems.append((col.get_text(), col.get('href')))
     # Strip out empty tuples
     return filter(lambda x: x[0], problems)
 
@@ -134,8 +132,7 @@ def basic_problems():
 def problem_by_tags():
     tags_url = url + '/problems/tags'
     r = session.get(tags_url)
-    html = str(r.text)
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(r.text, 'html.parser')
 
     rows = soup.find('table').find('tbody').find_all('tr')
 
@@ -143,17 +140,16 @@ def problem_by_tags():
 
     for columns in rows:
         col = columns.find_all('td')
-        cnt = int(col[1].get_text())
-        if (cnt > 0):
-            link = col[0].find('a')
-            tags.append((link.get_text(), cnt, link.get('href')))
+        link = col[0].find('a')
+        tags.append((link.get_text(), int(col[1].get_text()), link.get('href')))
+    tags = filter(lambda x: x[1] > 0, tags)
 
     print ('{:<40}||{:^50}||{:>40}\n\n'.format('INDEX', 'TAGS', 'PROBLEMS'))
     display2(tags)
 
 def display(tup):
     for index,p in enumerate(tup):
-        print ('{:<30}||{:>30}\n'.format(index+1, p[0]))
+        print ('\t\t{:<30}||{:>30}\n'.format(index+1, p[0]))
     star()
 
 def display2(tup):
@@ -181,11 +177,11 @@ def read_from_user():
         submit_solution()
     elif (choice == 3):
         star()
-        print ('\n{:<30}||{:>30}\n'.format("INDEX", "PROBLEM"))
+        print ('\n\t\t{:<30}||{:>30}\n'.format("INDEX", "PROBLEM"))
         display(submitted_problems)
     elif (choice == 4):
         star()
-        print ('\n{:<30}{:>30}\n'.format("INDEX", "PROBLEM"))
+        print ('\n\t\t{:<30}{:>30}\n'.format("INDEX", "PROBLEM"))
         display(todo_problems)
     elif (choice != 6):
         print ('Wrong choice! Enter Again.')
