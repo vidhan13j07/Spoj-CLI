@@ -6,14 +6,9 @@ import bz2
 
 try:
     from bs4 import BeautifulSoup
-except ImportError:
-    print ("Install BeautifulSoup")
-    sys.exit(1)
-
-try:
     import requests
 except ImportError:
-    print ("Install requests module")
+    print ("Install BeautifulSoup and requests module")
     sys.exit(1)
 
 if (sys.version_info > (3,0)):
