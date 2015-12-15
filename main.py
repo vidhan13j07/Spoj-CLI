@@ -39,6 +39,10 @@ def start_session(login_url, username, password):
         html.encode('utf-8')
         soup = BeautifulSoup(html, 'html.parser')
 
+        '''Check for the authentication of the user. After the login is successful, the problems submitted by the user and the todo
+              problems are stored in submitted_problems and todo_problems respectively which are a list of tuples storing in format
+              (problem, problem_status_by_user_link).
+        '''
         for auth in soup.find_all('h3'):
             if (auth.get_text() == 'Authentication failed!'):
                 print ('Authentication Failed!')
