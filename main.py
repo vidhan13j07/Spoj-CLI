@@ -87,7 +87,7 @@ def show_problems():
                 4 : tutorial_problems,
                 5 : riddle_problems,
                 6 : basic_problems,
-                7 : problem_by_tags,
+                7 : find_tags,
                 8 : read_from_user,
                 9 : sys.exit,
               }
@@ -132,11 +132,10 @@ def basic_problems():
     url1 = url + '/problems/basics/'
     pass
 
-def problem_by_tags():
+def find_tags():
     tags_url = url + '/problems/tags'
     r = session.get(tags_url)
     soup = BeautifulSoup(r.text, 'html.parser')
-
     rows = soup.find('table').find('tbody').find_all('tr')
 
     tags = []   #tags is list of tuples in format (tag name, count of problems, tag link)
@@ -144,11 +143,24 @@ def problem_by_tags():
     for columns in rows:
         col = columns.find_all('td')
         link = col[0].find('a')
-        tags.append((link.get_text(), int(col[1].get_text()), link.get('href')))
-    tags = filter(lambda x: x[1] > 0, tags)
+        tags.append((link.get_text(), col[1].get_text(), link.get('href')))
+    tags = filter(lambda x: int(x[1]) > 0, tags)
 
+    choose_tag(tags)
+
+def choose_tag(tags):
     print ('{:<40}||{:^50}||{:>40}\n\n'.format('INDEX', 'TAGS', 'PROBLEMS'))
     display2(tags)
+
+    try:
+        choice = int(raw_input('Enter your choice[1 : {}] : '.format(len(tags))))
+        star()
+        if (choice < 1 or choice > len(tags)):
+            raise ValueError
+    except ValueError:
+        choose_tag(tags)
+
+
 
 def display(tup):
     for index,p in enumerate(tup):
