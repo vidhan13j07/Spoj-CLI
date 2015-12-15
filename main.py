@@ -104,8 +104,9 @@ def show_problems():
         choice = int(raw_input('Enter your choice[1-9] : '))
         star()
         options[choice]()
-    except (ValueError, KeyError):
+    except (ValueError, KeyError) as e:
         print ('Wrong choice! Enter Again.')
+        print (e)
         show_problems()
 
 def classical_problems():
@@ -159,33 +160,41 @@ def choose_tag(tags):
             raise ValueError
     except ValueError:
         choose_tag(tags)
-    for i in range(1,68):
-        problems_by_tags(tags[i - 1][2])
+
+    problems_by_tags(tags[choice - 1][2])
 
 def problems_by_tags(link):
     link = url + link
     tag_problems = extract_problems(link)
-    print (len(tag_problems))
+
+    print ('{:^10}|{:^10}|{:^50}|{:^20}|{:^20}|{:^20}|{:^20}\n'.format("NUMBER", "ID", "NAME", "QUALITY", "USERS", "IMPLEMENTATION", "CONCEPT"))
+    display7(tag_problems)
+
+
 
 def extract_problems(link):
     r = session.get(link)
-    soup = BeautifulSoup(r.text, 'html.parser')
+    soup = BeautifulSoup(r.text.encode('utf-8'), 'html.parser')
     rows = soup.find('tbody').find_all('tr')
 
     problems = []
+    # problems is a list of tuples in format(ID, NAME, QUALITY, USERS, IMPLEMENTATION, CONCEPT, PROBLEM_LINK)
+
     for row in rows:
+        quality,implementation,concept = None,None,None
         columns = row.find_all('td')
         ind = columns[1].get_text().strip()
         problem_link = columns[2].find('a')
         if (columns[3].find('span')):
-            quality = columns[3].find('span').get_text()
+            quality = columns[3].find('span').get_text().strip()
         submissions = columns[4].find('a').get_text()
         difficulty = columns[6].find('div').find_all('div')
         if (len(difficulty) > 0 and difficulty[0].find('span')):
             implementation = difficulty[0].find('span').get_text()
         if (len(difficulty) > 1 and difficulty[1].find('span')):
             concept = difficulty[1].find('span').get_text()
-        problems.append((ind, problem_link.get_text(), quality, submissions, implementation, concept, problem_link.get('href')))
+
+        problems.append((ind, problem_link.get_text().encode('utf-8').strip(), quality, submissions, implementation, concept, problem_link.get('href')))
 
     return problems
 
@@ -197,6 +206,11 @@ def display(tup):
 def display2(tup):
     for index,p in enumerate(tup):
         print ('{:<40}||{:^50}||{:>40}\n'.format(index+1 ,p[0] ,p[1]))
+    star()
+
+def display7(tup):
+    for index,p in enumerate(tup):
+        print ('{:^10}|{:^10}|{!s:^50s}|{!s:^20}|{!s:^20}|{!s:^20}|{!s:^20}'.format(index+1, p[0], p[1], p[2], p[3], p[4], p[5]))
     star()
 
 def submit_solution():
@@ -227,7 +241,7 @@ def read_from_user():
         elif (choice != 6):
             raise ValueError
     except ValueError:
-            print ('Wrong choice! Enter Again.')
+            print ('pWrong choice! Enter Again.')
             read_from_user()
 
 def star():
