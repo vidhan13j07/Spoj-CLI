@@ -210,7 +210,7 @@ def display2(tup):
 
 def display7(tup):
     for index,p in enumerate(tup):
-        print ('{:^10}|{:^10}|{!s:^50s}|{!s:^20}|{!s:^20}|{!s:^20}|{!s:^20}'.format(index+1, p[0], p[1], p[2], p[3], p[4], p[5]))
+        print ('{:^10}|{:^10}|{!s:^50s}|{!s:^20}|{!s:^20}|{!s:^20}|{!s:^20}'.format(index+1, p[0], p[1].decode('utf-8'), p[2], p[3], p[4], p[5]))
     star()
 
 def submit_solution():
