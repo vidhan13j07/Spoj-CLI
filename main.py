@@ -66,6 +66,7 @@ def login_credentials(login_url):
     start_session(login_url, username, password)
 
 def read_problems(table):
+    # function to read all submiited problems and todo problems
     problems = []
     for row in table.find_all('tr'):
         for col in row.find_all('a'):
@@ -76,20 +77,6 @@ def read_problems(table):
 def show_problems():
     star()
 
-    print ('\t\t1. Classical\n\
-                2. Challenge\n\
-                3. Partial\n\
-                4. Tutorial\n\
-                5. Riddle\n\
-                6. Basics\n\
-                7. Problem by tags\n\
-                8. Back\n\
-                9. Exit')
-
-    choice = int(raw_input())
-
-    star()
-
     options = { 1 : classical_problems,
                 2 : challenge_problems,
                 3 : partial_problems,
@@ -98,10 +85,22 @@ def show_problems():
                 6 : basic_problems,
                 7 : problem_by_tags,
                 8 : read_from_user,
+                9 : sys.exit,
               }
-    if (choice >= 1 and choice <=8):
+    print ('\t\t1. Classical\n\
+                2. Challenge\n\
+                3. Partial\n\
+                4. Tutorial\n\
+                5. Riddle\n\
+                6. Basics\n\
+                7. Problem by tags\n\
+                8. Back\n\
+                9. Exit\n')
+    try:
+        choice = int(raw_input('Enter your choice[1-9] : '))
+        star()
         options[choice]()
-    elif (choice != 9):
+    except (ValueError, KeyError):
         print ('Wrong choice! Enter Again.')
         show_problems()
 
@@ -168,24 +167,25 @@ def read_from_user():
                 3. Show submitted problems by the user\n\
                 4. Show todo problems\n\
                 5. Download all solutions to submitted problems by user\n\
-                6. Exit')
-
-    choice = int(raw_input())
-    if (choice == 1):
-        show_problems()
-    elif (choice == 2):
-        submit_solution()
-    elif (choice == 3):
+                6. Exit\n')
+    try:
+        choice = int(raw_input('Enter your choice[1-6] : '))
         star()
-        print ('\n\t\t{:<30}||{:>30}\n'.format("INDEX", "PROBLEM"))
-        display(submitted_problems)
-    elif (choice == 4):
-        star()
-        print ('\n\t\t{:<30}{:>30}\n'.format("INDEX", "PROBLEM"))
-        display(todo_problems)
-    elif (choice != 6):
-        print ('Wrong choice! Enter Again.')
-        read_from_user()
+        if (choice == 1):
+            show_problems()
+        elif (choice == 2):
+            submit_solution()
+        elif (choice == 3):
+            print ('\n\t\t{:<30}||{:>30}\n'.format("INDEX", "PROBLEM"))
+            display(submitted_problems)
+        elif (choice == 4):
+            print ('\n\t\t{:<30}{:>30}\n'.format("INDEX", "PROBLEM"))
+            display(todo_problems)
+        elif (choice != 6):
+            raise ValueError
+    except ValueError:
+            print ('Wrong choice! Enter Again.')
+            read_from_user()
 
 def star():
     print ('\n' + '*'*150 + '\n')
