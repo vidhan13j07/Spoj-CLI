@@ -7,12 +7,15 @@ import bz2
 try:
     from bs4 import BeautifulSoup
     import requests
+    global version
+    version = True
 except ImportError:
     print ("Install BeautifulSoup and requests module")
     sys.exit(1)
 
 if (sys.version_info > (3,0)):
     raw_input = input
+    version = False
 
 def first_time_login():
     name = raw_input("Enter your spoj username: ")
@@ -193,8 +196,11 @@ def extract_problems(link):
             implementation = difficulty[0].find('span').get_text()
         if (len(difficulty) > 1 and difficulty[1].find('span')):
             concept = difficulty[1].find('span').get_text()
+        name = problem_link.get_text().strip()
+        if (version):
+            name = name.encode('utf-8')
 
-        problems.append((ind, problem_link.get_text().encode('utf-8').strip(), quality, submissions, implementation, concept, problem_link.get('href')))
+        problems.append((ind, name, quality, submissions, implementation, concept, problem_link.get('href')))
 
     return problems
 
@@ -210,7 +216,7 @@ def display2(tup):
 
 def display7(tup):
     for index,p in enumerate(tup):
-        print ('{:^10}|{:^10}|{!s:^50s}|{!s:^20}|{!s:^20}|{!s:^20}|{!s:^20}'.format(index+1, p[0], p[1].decode('utf-8'), p[2], p[3], p[4], p[5]))
+        print ('{:^10}|{:^10}|{!s:^50s}|{!s:^20}|{!s:^20}|{!s:^20}|{!s:^20}'.format(index+1, p[0], p[1], p[2], p[3], p[4], p[5]))
     star()
 
 def submit_solution():
@@ -241,7 +247,7 @@ def read_from_user():
         elif (choice != 6):
             raise ValueError
     except ValueError:
-            print ('pWrong choice! Enter Again.')
+            print ('Wrong choice! Enter Again.')
             read_from_user()
 
 def star():
