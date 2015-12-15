@@ -76,7 +76,7 @@ def read_problems(table):
         for col in row.find_all('a'):
             problems.append((col.get_text(), col.get('href')))
     # Strip out empty tuples
-    return filter(lambda x: x[0], problems)
+    return list(filter(lambda x: x[0], problems))
 
 def show_problems():
     star()
@@ -144,7 +144,7 @@ def find_tags():
         col = columns.find_all('td')
         link = col[0].find('a')
         tags.append((link.get_text(), col[1].get_text(), link.get('href')))
-    tags = filter(lambda x: int(x[1]) > 0, tags)
+    tags = list(filter(lambda x: int(x[1]) > 0, tags))
 
     choose_tag(tags)
 
@@ -159,8 +159,35 @@ def choose_tag(tags):
             raise ValueError
     except ValueError:
         choose_tag(tags)
+    for i in range(1,68):
+        problems_by_tags(tags[i - 1][2])
 
+def problems_by_tags(link):
+    link = url + link
+    tag_problems = extract_problems(link)
+    print (len(tag_problems))
 
+def extract_problems(link):
+    r = session.get(link)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    rows = soup.find('tbody').find_all('tr')
+
+    problems = []
+    for row in rows:
+        columns = row.find_all('td')
+        ind = columns[1].get_text().strip()
+        problem_link = columns[2].find('a')
+        if (columns[3].find('span')):
+            quality = columns[3].find('span').get_text()
+        submissions = columns[4].find('a').get_text()
+        difficulty = columns[6].find('div').find_all('div')
+        if (len(difficulty) > 0 and difficulty[0].find('span')):
+            implementation = difficulty[0].find('span').get_text()
+        if (len(difficulty) > 1 and difficulty[1].find('span')):
+            concept = difficulty[1].find('span').get_text()
+        problems.append((ind, problem_link.get_text(), quality, submissions, implementation, concept, problem_link.get('href')))
+
+    return problems
 
 def display(tup):
     for index,p in enumerate(tup):
