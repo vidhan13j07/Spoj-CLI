@@ -109,7 +109,6 @@ def show_problems():
         options[choice]()
     except (ValueError, KeyError) as e:
         print ('Wrong choice! Enter Again.')
-        print (e)
         show_problems()
 
 def classical_problems():
@@ -142,7 +141,7 @@ def find_tags():
     soup = BeautifulSoup(r.text, 'html.parser')
     rows = soup.find('table').find('tbody').find_all('tr')
 
-    tags = []   #tags is list of tuples in format (tag name, count of problems, tag link)
+    tags = []   #tags is list of tuples in format (tag name, count of problems, tag link) that stores all tags
 
     for columns in rows:
         col = columns.find_all('td')
@@ -156,30 +155,28 @@ def choose_tag(tags):
     print ('{:<40}||{:^50}||{:>40}\n\n'.format('INDEX', 'TAGS', 'PROBLEMS'))
     display2(tags)
 
-    try:
-        choice = int(raw_input('Enter your choice[1 : {}] : '.format(len(tags))))
-        star()
-        if (choice < 1 or choice > len(tags)):
-            raise ValueError
-    except ValueError:
-        choose_tag(tags)
+    choice = make_choice(tags)
 
     tag_problems = extract_problems(url + tags[choice - 1][-1])
-    problems_by_tags(tags[choice - 1][2])
+    # tag_problems store all the problems associated with the chosen tag
 
     print ('{:^10}|{:^10}|{:^50}|{:^20}|{:^20}|{:^20}|{:^20}\n'.format("NUMBER", "ID", "NAME", "QUALITY", "USERS", "IMPLEMENTATION", "CONCEPT"))
     display7(tag_problems)
 
+    choice = make_choice(tag_problems)
+    open_problem(url + tag_problems[choice - 1][-1])
 
-def problems_by_tags(tag_problems):
+def make_choice(lis):
     try:
-        choice = int(raw_input('Enter which problem to open[1 : {}] : '.format(len(tag_problems))))
+        choice = int(raw_input('Enter which problem to open[1 : {}] : '.format(len(lis))))
         star()
-        if (choice < 1 or choice > len(tag_problems)):
+        if (choice < 1 or choice > len(lis)):
             raise ValueError
     except ValueError:
-        problem_by_tags(tag_problems)
+        print ('Wrong Input!Enter Again!')
+        return make_choice(lis)
 
+    return choice
 
 def extract_problems(link):
     r = session.get(link)
@@ -209,6 +206,10 @@ def extract_problems(link):
         problems.append((ind, name, quality, submissions, implementation, concept, problem_link.get('href')))
 
     return problems
+
+def open_problem(link):
+    import webbrowser as wb
+    wb.open_new(link)
 
 def display(tup):
     for index,p in enumerate(tup):
