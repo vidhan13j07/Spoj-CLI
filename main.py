@@ -164,15 +164,21 @@ def choose_tag(tags):
     except ValueError:
         choose_tag(tags)
 
+    tag_problems = extract_problems(url + tags[choice - 1][-1])
     problems_by_tags(tags[choice - 1][2])
-
-def problems_by_tags(link):
-    link = url + link
-    tag_problems = extract_problems(link)
 
     print ('{:^10}|{:^10}|{:^50}|{:^20}|{:^20}|{:^20}|{:^20}\n'.format("NUMBER", "ID", "NAME", "QUALITY", "USERS", "IMPLEMENTATION", "CONCEPT"))
     display7(tag_problems)
 
+
+def problems_by_tags(tag_problems):
+    try:
+        choice = int(raw_input('Enter which problem to open[1 : {}] : '.format(len(tag_problems))))
+        star()
+        if (choice < 1 or choice > len(tag_problems)):
+            raise ValueError
+    except ValueError:
+        problem_by_tags(tag_problems)
 
 
 def extract_problems(link):
