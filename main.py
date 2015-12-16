@@ -54,8 +54,7 @@ def start_session(login_url, username, password):
                 start_session(url, name, p)
                 break
         else:
-            r = session.get('http://www.spoj.com/myaccount/')
-            soup = BeautifulSoup(r.text, 'html.parser')
+            soup = return_html('http://www.spoj.com/myaccount/')
             tables = soup.find_all('table')
             global submitted_problems,todo_problems
             submitted_problems = read_problems(tables[0])
@@ -137,8 +136,7 @@ def basic_problems():
 
 def find_tags():
     tags_url = url + '/problems/tags'
-    r = session.get(tags_url)
-    soup = BeautifulSoup(r.text, 'html.parser')
+    soup = return_html(tags_url)
     rows = soup.find('table').find('tbody').find_all('tr')
 
     tags = []   #tags is list of tuples in format (tag name, count of problems, tag link) that stores all tags
@@ -210,6 +208,12 @@ def extract_problems(link):
 def open_problem(link):
     import webbrowser as wb
     wb.open_new(link)
+    #soup = return_html(link)
+
+def return_html(link):
+    r = session.get(link)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    return soup
 
 def display(tup):
     for index,p in enumerate(tup):
