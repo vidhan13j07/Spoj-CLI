@@ -157,18 +157,20 @@ def choose_tag(tags):
 
     tag_problems = extract_problems(url + tags[choice - 1][-1])
     # tag_problems store all the problems associated with the chosen tag
-
-    print ('{:^10}|{:^10}|{:^50}|{:^20}|{:^20}|{:^20}|{:^20}\n'.format("NUMBER", "ID", "NAME", "QUALITY", "USERS", "IMPLEMENTATION", "CONCEPT"))
-    display7(tag_problems)
-
-    choice = make_choice(tag_problems)
-    open_problem(url + tag_problems[choice - 1][-1])
+    while (True):
+        print ('{:^10}|{:^10}|{:^50}|{:^20}|{:^20}|{:^20}|{:^20}\n'.format("NUMBER", "ID", "NAME", "QUALITY", "USERS", "IMPLEMENTATION", "CONCEPT"))
+        display7(tag_problems)
+        choice = make_choice(tag_problems)
+        #if (choice < 0 or choice == 0):
+        #    break
+        open_problem(url + tag_problems[choice - 1][-1])
+        break
 
 def make_choice(lis):
     try:
         choice = int(raw_input('Enter which problem to open[1 : {}] : '.format(len(lis))))
         star()
-        if (choice < 1 or choice > len(lis)):
+        if (choice > len(lis)):
             raise ValueError
     except ValueError:
         print ('Wrong Input!Enter Again!')
@@ -206,13 +208,16 @@ def extract_problems(link):
     return problems
 
 def open_problem(link):
-    import webbrowser as wb
-    wb.open_new(link)
-    #soup = return_html(link)
+    #import webbrowser as wb
+    #wb.open_new(link)
+    soup = return_html(link)
+    statement = soup.find("div", {"id" : "problem-body"})
+    print (statement.get_text())
 
 def return_html(link):
     r = session.get(link)
-    soup = BeautifulSoup(r.text, 'html.parser')
+    page_text = r.text.replace('<br />', '\n')
+    soup = BeautifulSoup(page_text, 'html.parser')
     return soup
 
 def display(tup):
