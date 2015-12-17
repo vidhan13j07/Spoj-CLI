@@ -9,5 +9,5 @@ setup ( name = 'spojtool',
         license = 'MIT',
         packages = ['spojtool'],
         scripts = ['bin/spojtool'],
-        install_requires = [ 'BeautifulSoup4' ],
+        install_requires = [ 'BeautifulSoup4','requests' ],
         zip_safe= False)
