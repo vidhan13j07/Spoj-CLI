@@ -132,7 +132,7 @@ def tutorial_problems():
     pass
 
 def riddle_problems():
-    problems_riddle = extract_problems(url + '/problems/riddle/')
+    problems_riddle = extract_problems(url + '/problems/riddle/unsolved/')
     while (True):
         display7(problems_riddle)
 
@@ -143,8 +143,15 @@ def riddle_problems():
         open_problem(url + problems_riddle[choice - 1][-1])
 
 def basic_problems():
-    url1 = url + '/problems/basics/'
-    pass
+    problems_basic = extract_problems(url + '/problems/basics/unsolved/')
+    while (True):
+        display7(problems_basic)
+
+        choice = make_choice(len(problems_basic))
+        if (choice == 0):
+            break
+
+        open_problem(url + problems_basic[choice - 1][-1])
 
 def find_tags():
     soup = return_html(url + '/problems/tags')
@@ -218,8 +225,6 @@ def extract_problems(link):
             name = name.encode('utf-8')
 
         problems.append((ind, name, quality, submissions, implementation, concept, problem_link.get('href')))
-        print (problems[-1])
-        print
     return problems
 
 def open_problem(link):
