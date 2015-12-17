@@ -1,4 +1,5 @@
-# Spoj-toolkit
+#Spoj-toolkit 
+[![Build Status](https://travis-ci.org/vidhan13j07/Spoj-toolkit.svg?branch=master)](https://travis-ci.org/vidhan13j07/Spoj-toolkit)
 
 A command line tool to read the problems and submit solutions directly through terminal.
 
