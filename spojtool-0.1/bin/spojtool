@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import getpass
 import os
@@ -130,8 +132,15 @@ def tutorial_problems():
     pass
 
 def riddle_problems():
-    url1 = url + '/problems/riddle/'
-    pass
+    problems_riddle = extract_problems(url + '/problems/riddle/')
+    while (True):
+        display7(problems_riddle)
+
+        choice = make_choice(len(problems_riddle))
+        if (choice == 0):
+            break
+
+        open_problem(url + problems_riddle[choice - 1][-1])
 
 def basic_problems():
     url1 = url + '/problems/basics/'
@@ -209,7 +218,8 @@ def extract_problems(link):
             name = name.encode('utf-8')
 
         problems.append((ind, name, quality, submissions, implementation, concept, problem_link.get('href')))
-
+        print (problems[-1])
+        print
     return problems
 
 def open_problem(link):
