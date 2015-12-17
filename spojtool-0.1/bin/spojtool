@@ -81,19 +81,21 @@ def read_problems(table):
     return list(filter(lambda x: x[0], problems))
 
 def show_problems():
-    star()
+    while (True):
+        star()
 
-    options = { 1 : classical_problems,
-                2 : challenge_problems,
-                3 : partial_problems,
-                4 : tutorial_problems,
-                5 : riddle_problems,
-                6 : basic_problems,
-                7 : find_tags,
-                8 : read_from_user,
-                9 : sys.exit,
-              }
-    print ('\t\t1. Classical\n\
+        options = { 1 : classical_problems,
+                    2 : challenge_problems,
+                    3 : partial_problems,
+                    4 : tutorial_problems,
+                    5 : riddle_problems,
+                    6 : basic_problems,
+                    7 : find_tags,
+                    8 : read_from_user,
+                    9 : sys.exit,
+                }
+        print ('\t\t0. Back\n\
+                1. Classical\n\
                 2. Challenge\n\
                 3. Partial\n\
                 4. Tutorial\n\
@@ -102,13 +104,14 @@ def show_problems():
                 7. Problem by tags\n\
                 8. Back\n\
                 9. Exit\n')
-    try:
-        choice = int(raw_input('Enter your choice[1-9] : '))
-        star()
-        options[choice]()
-    except (ValueError, KeyError) as e:
-        print ('Wrong choice! Enter Again.')
-        show_problems()
+        try:
+            choice = int(raw_input('Enter your choice[1-9] : '))
+            if (choice == 0):
+                break
+            star()
+            options[choice]()
+        except (ValueError, KeyError):
+            print ('Wrong choice! Enter Again.')
 
 def classical_problems():
     url1 = url + '/problems/classical/'
@@ -135,8 +138,7 @@ def basic_problems():
     pass
 
 def find_tags():
-    tags_url = url + '/problems/tags'
-    soup = return_html(tags_url)
+    soup = return_html(url + '/problems/tags')
     rows = soup.find('table').find('tbody').find_all('tr')
 
     tags = []   #tags is list of tuples in format (tag name, count of problems, tag link) that stores all tags
@@ -150,27 +152,30 @@ def find_tags():
     choose_tag(tags)
 
 def choose_tag(tags):
-    print ('{:<40}||{:^50}||{:>40}\n\n'.format('INDEX', 'TAGS', 'PROBLEMS'))
-    display2(tags)
-
-    choice = make_choice(tags)
-
-    tag_problems = extract_problems(url + tags[choice - 1][-1])
-    # tag_problems store all the problems associated with the chosen tag
     while (True):
-        print ('{:^10}|{:^10}|{:^50}|{:^20}|{:^20}|{:^20}|{:^20}\n'.format("NUMBER", "ID", "NAME", "QUALITY", "USERS", "IMPLEMENTATION", "CONCEPT"))
-        display7(tag_problems)
-        choice = make_choice(tag_problems)
-        #if (choice < 0 or choice == 0):
-        #    break
-        open_problem(url + tag_problems[choice - 1][-1])
-        break
+        print ('{:<40}||{:^50}||{:>40}\n\n'.format('INDEX', 'TAGS', 'PROBLEMS'))
+        display2(tags)
+        choice = make_choice(len(tags))
+        if (choice == 0):
+            break
 
-def make_choice(lis):
+        tag_problems = extract_problems(url + tags[choice - 1][-1])
+        # tag_problems store all the problems associated with the chosen tag
+
+        while (True):
+            print ('{:^10}|{:^10}|{:^50}|{:^20}|{:^20}|{:^20}|{:^20}\n'.format("NUMBER", "ID", "NAME", "QUALITY", "USERS", "IMPLEMENTATION", "CONCEPT"))
+            display7(tag_problems)
+            choice = make_choice(len(tag_problems))
+            if (choice == 0):
+                break
+
+            open_problem(url + tag_problems[choice - 1][-1])
+
+def make_choice(l):
     try:
-        choice = int(raw_input('Enter which problem to open[1 : {}] : '.format(len(lis))))
+        choice = int(raw_input('Enter which problem to open[1 : {}] (0 for back) : '.format(l)))
         star()
-        if (choice > len(lis)):
+        if (choice > l):
             raise ValueError
     except ValueError:
         print ('Wrong Input!Enter Again!')
@@ -208,6 +213,8 @@ def extract_problems(link):
     return problems
 
 def open_problem(link):
+    # Function that extracts problem statement, input description ,output description and test-cases
+
     #import webbrowser as wb
     #wb.open_new(link)
     soup = return_html(link)
@@ -239,32 +246,34 @@ def submit_solution():
     pass
 
 def read_from_user():
-    star()
+    while (True):
+        star()
 
-    print ('\t\t1. Show problems\n\
+        print ('\t\t1. Show problems\n\
                 2. Submit solution\n\
                 3. Show submitted problems by the user\n\
                 4. Show todo problems\n\
                 5. Download all solutions to submitted problems by user\n\
                 6. Exit\n')
-    try:
-        choice = int(raw_input('Enter your choice[1-6] : '))
-        star()
-        if (choice == 1):
-            show_problems()
-        elif (choice == 2):
-            submit_solution()
-        elif (choice == 3):
-            print ('\n\t\t{:<30}||{:>30}\n'.format("INDEX", "PROBLEM"))
-            display(submitted_problems)
-        elif (choice == 4):
-            print ('\n\t\t{:<30}{:>30}\n'.format("INDEX", "PROBLEM"))
-            display(todo_problems)
-        elif (choice != 6):
-            raise ValueError
-    except ValueError:
+        try:
+            choice = int(raw_input('Enter your choice[1-6] : '))
+            star()
+            if (choice == 1):
+                show_problems()
+            elif (choice == 2):
+                submit_solution()
+            elif (choice == 3):
+                print ('\n\t\t{:<30}||{:>30}\n'.format("INDEX", "PROBLEM"))
+                display(submitted_problems)
+            elif (choice == 4):
+                print ('\n\t\t{:<30}{:>30}\n'.format("INDEX", "PROBLEM"))
+                display(todo_problems)
+            elif (choice == 6):
+                break
+            else:
+                raise ValueError
+        except ValueError:
             print ('Wrong choice! Enter Again.')
-            read_from_user()
 
 def star():
     print ('\n' + '*'*150 + '\n')
