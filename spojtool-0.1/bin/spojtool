@@ -134,7 +134,7 @@ def tutorial_problems():
 def riddle_problems():
     problems_riddle = extract_problems(url + '/problems/riddle/unsolved/')
     while (True):
-        display7(problems_riddle)
+        display8(problems_riddle)
 
         choice = make_choice(len(problems_riddle))
         if (choice == 0):
@@ -145,7 +145,7 @@ def riddle_problems():
 def basic_problems():
     problems_basic = extract_problems(url + '/problems/basics/unsolved/')
     while (True):
-        display7(problems_basic)
+        display8(problems_basic)
 
         choice = make_choice(len(problems_basic))
         if (choice == 0):
@@ -179,8 +179,7 @@ def choose_tag(tags):
         # tag_problems store all the problems associated with the chosen tag
 
         while (True):
-            print ('{:^10}|{:^10}|{:^50}|{:^20}|{:^20}|{:^20}|{:^20}\n'.format("NUMBER", "ID", "NAME", "QUALITY", "USERS", "IMPLEMENTATION", "CONCEPT"))
-            display7(tag_problems)
+            display8(tag_problems)
             choice = make_choice(len(tag_problems))
             if (choice == 0):
                 break
@@ -195,7 +194,7 @@ def make_choice(l):
             raise ValueError
     except ValueError:
         print ('Wrong Input!Enter Again!')
-        return make_choice(lis)
+        return make_choice(l)
 
     return choice
 
@@ -215,6 +214,7 @@ def extract_problems(link):
         if (columns[3].find('span')):
             quality = columns[3].find('span').get_text().strip()
         submissions = columns[4].find('a').get_text()
+        accuracy = columns[5].find('a').get_text()
         difficulty = columns[6].find('div').find_all('div')
         if (len(difficulty) > 0 and difficulty[0].find('span')):
             implementation = difficulty[0].find('span').get_text()
@@ -224,17 +224,21 @@ def extract_problems(link):
         if (version):
             name = name.encode('utf-8')
 
-        problems.append((ind, name, quality, submissions, implementation, concept, problem_link.get('href')))
+        problems.append((ind, name, quality, submissions, accuracy, implementation, concept, problem_link.get('href')))
     return problems
 
 def open_problem(link):
     # Function that extracts problem statement, input description ,output description and test-cases
-
+    print ('\n\n\n\n\n')
+    star()
+    print ('{:^140}'.format('Problem'))
+    star()
     #import webbrowser as wb
     #wb.open_new(link)
     soup = return_html(link)
     statement = soup.find("div", {"id" : "problem-body"})
     print (statement.get_text())
+    star()
 
 def return_html(link):
     r = session.get(link)
@@ -252,9 +256,10 @@ def display2(tup):
         print ('{:<40}||{:^50}||{:>40}\n'.format(index+1 ,p[0] ,p[1]))
     star()
 
-def display7(tup):
+def display8(tup):
+    print ('{:^10}|{:^10}|{:^55}|{:^10}|{:^15}|{:^10}|{:^20}|{:^10}\n'.format("NUMBER", "ID", "NAME", "QUALITY", "USERS", "ACCURACY", "IMPLEMENTATION", "CONCEPT"))
     for index,p in enumerate(tup):
-        print ('{:^10}|{:^10}|{!s:^50s}|{!s:^20}|{!s:^20}|{!s:^20}|{!s:^20}'.format(index+1, p[0], p[1], p[2], p[3], p[4], p[5]))
+        print ('{:^10}|{:^10}|{!s:^55s}|{!s:^10}|{!s:^15}|{!s:^10}|{!s:^20}|{!s:^10}'.format(index+1, p[0], p[1], p[2], p[3], p[4], p[5],p[6]))
     star()
 
 def submit_solution():
