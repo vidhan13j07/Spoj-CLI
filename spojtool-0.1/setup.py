@@ -10,4 +10,4 @@ setup ( name = 'spojtool',
         packages = ['spojtool'],
         scripts = ['bin/spojtool'],
         install_requires = [ 'BeautifulSoup4' ],
-        zip_false = False)
+        zip_safe= False)
