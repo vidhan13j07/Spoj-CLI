@@ -291,8 +291,10 @@ def read_from_user():
             print ('Wrong choice! Enter Again.')
 
 def star():
-    print ('\n' + '*'*150 + '\n')
-
+	rows,cols = os.popen('stty size','r').read().split()
+	cols = int(cols)
+	print( '\n' +  '*'*cols + '\n' )
+	
 def main():
     global url
     url = "http://www.spoj.com"
