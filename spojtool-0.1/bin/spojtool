@@ -5,19 +5,16 @@ import getpass
 import os
 import re
 import bz2
-
-try:
-    from bs4 import BeautifulSoup
-    import requests
-    global version
-    version = True
-except ImportError:
-    print ("Install BeautifulSoup and requests module")
-    sys.exit(1)
+import requests
+from bs4 import BeautifulSoup
 
 if (sys.version_info > (3,0)):
     raw_input = input
+    global version
     version = False
+else:
+    global version
+    version = True
 
 def first_time_login():
     name = raw_input("Enter your spoj username: ")
@@ -340,7 +337,7 @@ def star():
 	rows,cols = os.popen('stty size','r').read().split()
 	cols = int(cols)
 	print( '\n' +  '*'*cols + '\n' )
-	
+
 def main():
     global url
     url = "http://www.spoj.com"
