@@ -116,19 +116,57 @@ def show_problems():
             print ('Wrong choice! Enter Again.')
 
 def classical_problems():
-    url1 = url + '/problems/classical/'
-    pass
+    choices(url + '/problems/classical/unsolved/')
 
 def challenge_problems():
-    url1 = url + '/problems/challenge/'
-    pass
+    choices(url + '/problems/challenge/unsolved/')
 
 def partial_problems():
-    url1 = url + '/problems/partial/'
-    pass
+    choices(url + '/problems/partial/unsolved/')
 
 def tutorial_problems():
-    url1 = url + '/problems/tutorial/'
+    choices(url + '/problems/tutorial/unsolved/')
+
+def choices(link):
+    soup = return_html(link)
+    print (soup.prettify())
+    while (True):
+        star()
+
+        options = {  1 : sort_by_id,
+                     2 : sort_by_name,
+                     3 : sort_by_quality,
+                     4 : sort_by_users,
+                     5 : sort_by_accuracy,
+                     6 : sys.exit,
+                  }
+
+        print ('\t\t1. Sorted by ID\n\
+                2. Sorted by name\n\
+                3. Sorted by quality\n\
+                4. Sorted by users\n\
+                5. Sorted by accuracy\n\
+                6. Exit\n')
+
+        choice = make_choice(6)
+        if (choice == 0):
+            break
+
+        options[choice]()
+
+def sort_by_id():
+    pass
+
+def sort_by_name():
+    pass
+
+def sort_by_quality():
+    pass
+
+def sort_by_users():
+    pass
+
+def sort_by_accuracy():
     pass
 
 def riddle_problems():
