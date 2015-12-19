@@ -8,12 +8,11 @@ import bz2
 import requests
 from bs4 import BeautifulSoup
 
+global version
 if (sys.version_info > (3,0)):
     raw_input = input
-    global version
     version = False
 else:
-    global version
     version = True
 
 def first_time_login():
@@ -125,46 +124,50 @@ def tutorial_problems():
     choices(url + '/problems/tutorial/unsolved/')
 
 def choices(link):
-    soup = return_html(link)
-    print (soup.prettify())
     while (True):
         star()
 
-        options = {  1 : sort_by_id,
-                     2 : sort_by_name,
-                     3 : sort_by_quality,
-                     4 : sort_by_users,
-                     5 : sort_by_accuracy,
-                     6 : sys.exit,
+        options = {  1 : '5',
+                     2 : '2',
+                     3 : '11',
+                     4 : '6',
+                     5 : '7',
+                     6 : '9',
+                     7 : '10',
                   }
 
         print ('\t\t1. Sorted by ID\n\
-                2. Sorted by name\n\
-                3. Sorted by quality\n\
-                4. Sorted by users\n\
-                5. Sorted by accuracy\n\
-                6. Exit\n')
+                2. Sorted by Name\n\
+                3. Sorted by Quality\n\
+                4. Sorted by Users\n\
+                5. Sorted by Accuracy\n\
+                6. Sorted by Concept Difficulty\n\
+                7. Sorted by Implementation Difficulty\n\
+                8. Exit\n')
 
-        choice = make_choice(6)
-        if (choice == 0):
+        choice = make_choice(8)
+        if(choice == 0):
             break
+        elif (choice == 8):
+            sys.exit()
 
-        options[choice]()
+        star()
+        print ('\t\t1. Increasing Order\n\
+                2. Decreasing Order\n')
+        ch = make_choice(2)
+        star()
+        urll = link + 'sort='
+        if (ch == 2):
+            urll += '-'
+        if(ch != 0):
+            urll += options[choice]
+            list_problems(urll)
 
-def sort_by_id():
-    pass
-
-def sort_by_name():
-    pass
-
-def sort_by_quality():
-    pass
-
-def sort_by_users():
-    pass
-
-def sort_by_accuracy():
-    pass
+def list_problems(link, start = 0):
+    link += (',start=' + repr(start))
+    print link
+    problems = extract_problems(link)
+    display8(problems)
 
 def riddle_problems():
     problems_riddle = extract_problems(url + '/problems/riddle/unsolved/')
@@ -343,7 +346,6 @@ def main():
     url = "http://www.spoj.com"
     login_url = "http://www.spoj.com/login"
     login_credentials(login_url)
-
 
 if __name__ == '__main__':
     main()
