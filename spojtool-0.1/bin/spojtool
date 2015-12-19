@@ -92,8 +92,7 @@ def show_problems():
                     8 : read_from_user,
                     9 : sys.exit,
                 }
-        print ('\t\t0. Back\n\
-                1. Classical\n\
+        print ('\t\t1. Classical\n\
                 2. Challenge\n\
                 3. Partial\n\
                 4. Tutorial\n\
@@ -103,7 +102,7 @@ def show_problems():
                 8. Back\n\
                 9. Exit\n')
         try:
-            choice = int(raw_input('Enter your choice[1-9] : '))
+            choice = int(raw_input('Enter your choice[1-9](0 for back) : '))
             if (choice == 0):
                 break
             star()
@@ -161,13 +160,42 @@ def choices(link):
             urll += '-'
         if(ch != 0):
             urll += options[choice]
-            list_problems(urll)
+            choice = list_problems(urll)
 
-def list_problems(link, start = 0):
+def list_problems(link, start = 0, last = False):
     link += (',start=' + repr(start))
-    print link
     problems = extract_problems(link)
-    display8(problems)
+    while (True):
+        display8(problems)
+        if (len(problems) < 50):
+            last = True
+        star()
+        try:
+            if (start>0):
+                print ('-1. Last 50 problems')
+            print ('0. Back')
+            if (not last):
+                print ('100. Next 50 problems')
+            print ('[1 : {} ]. For problem to open'.format(len(problems)))
+            choice = int(raw_input('Enter your choice : '))
+
+            star()
+            if ((start == 0 and choice == -1) or (choice < -1) or (choice > len(problems) and choice != 100) or (last and choice == 100)):
+                raise ValueError
+            elif (choice == -1):
+                break
+            elif (choice == 100):
+                choice = list_problems(link, start+50)
+            elif (choice != 0) :
+                open_problem(url + problems[choice - 1][-1], problems[choice - 1][1])
+            star()
+
+            if (choice == 0):
+                return choice
+
+        except ValueError:
+            print ('\t\t\t\tWrong Input!Try Again!')
+            star()
 
 def riddle_problems():
     problems_riddle = extract_problems(url + '/problems/riddle/unsolved/')
@@ -178,7 +206,7 @@ def riddle_problems():
         if (choice == 0):
             break
 
-        open_problem(url + problems_riddle[choice - 1][-1])
+        open_problem(url + problems_riddle[choice - 1][-1],problems_riddle[choice - 1][1])
 
 def basic_problems():
     problems_basic = extract_problems(url + '/problems/basics/unsolved/')
@@ -189,7 +217,7 @@ def basic_problems():
         if (choice == 0):
             break
 
-        open_problem(url + problems_basic[choice - 1][-1])
+        open_problem(url + problems_basic[choice - 1][-1], problems_basic[choice - 1][1])
 
 def find_tags():
     soup = return_html(url + '/problems/tags')
@@ -222,11 +250,11 @@ def choose_tag(tags):
             if (choice == 0):
                 break
 
-            open_problem(url + tag_problems[choice - 1][-1])
+            open_problem(url + tag_problems[choice - 1][-1], tag_problems[choice - 1][1])
 
 def make_choice(l):
     try:
-        choice = int(raw_input('Enter which problem to open[1 : {}] (0 for back) : '.format(l)))
+        choice = int(raw_input('Enter your choice[1 : {}] (0 for back) : '.format(l)))
         star()
         if (choice > l):
             raise ValueError
@@ -265,11 +293,11 @@ def extract_problems(link):
         problems.append((ind, name, quality, submissions, accuracy, implementation, concept, problem_link.get('href')))
     return problems
 
-def open_problem(link):
+def open_problem(link, name):
     # Function that extracts problem statement, input description ,output description and test-cases
     print ('\n\n\n\n\n')
     star()
-    print ('{:^140}'.format('Problem'))
+    print ('Problem{:^120}'.format(name))
     star()
     #import webbrowser as wb
     #wb.open_new(link)
