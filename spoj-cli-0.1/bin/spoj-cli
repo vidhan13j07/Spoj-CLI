@@ -346,10 +346,18 @@ def options_after_open_problem(link, name):
 
         star()
 
-def my_status(link):
+def my_status(link, check = False):
     soup = return_html(link)
-    submissions = []
     rows = soup.find('table', {'class': 'problems'}).findAll('tr')
+    if (check):
+        col = rows[1].find_all('td')
+        status = col[4].text.replace('edit', ' ').replace('ideone it', ' ').strip()
+        print " ".join(status.split("\n"))
+        if (status.startswith('running') or status.startswith('compiling')):
+            return False
+        else:
+            return True
+    submissions = []
     for ind,row in enumerate(rows):
         if (ind == 0):
             col = row.findAll('th')
@@ -409,13 +417,27 @@ def display8(tup):
         print ('{:^10}|{:^10}|{!s:^55s}|{!s:^10}|{!s:^15}|{!s:^10}|{!s:^20}|{!s:^10}'.format(index+1, p[0], p[1], p[2], p[3], p[4], p[5],p[6]))
     star()
 
-def submit_solution(name):
-    link = url + '/submit/complete/'
-    filepath = raw_input('Enter the full path of the source code : ')
-    payload = dict(problemcode = name, lang ='4', file = open(filepath, 'rb').read(), submit = "Send")
-    r = session.post(link, data = payload)
-    sub_id = re.search(r'"newSubmissionId" value="(\d+)"/>', r.text).group(1)
-
+def submit_solution(name, ask_problem = False):
+    while (True):
+        link = url + '/submit/complete/'
+        try:
+            if (ask_problem):
+                name = raw_input('Enter Problem Code : ')
+            filepath = raw_input('Enter the full path of the source code : ')
+            payload = dict(problemcode = name, lang ='4', file = open(filepath, 'rb').read(), submit = "Send")
+            r = session.post(link, data = payload)
+            sub_id = re.search(r'"newSubmissionId" value="(\d+)"/>', r.text).group(1)
+            break
+        except AttributeError:
+            print ('Wrong ProblemCode!Enter Again!')
+            star()
+        except IOError:
+            print ("FilePath is not valid!Enter Again!")
+            star()
+    while (True):
+        if (my_status(url + '/status/' + name + ',' + user + '/', True)):
+            break
+    my_status(url + '/status/' + name + ',' + user + '/')
 
 def read_from_user():
     while (True):
@@ -433,8 +455,7 @@ def read_from_user():
             if (choice == 1):
                 show_problems()
             elif (choice == 2):
-                name = raw_input('Enter Problem Code : ')
-                submit_solution(name)
+                submit_solution('', True)
             elif (choice == 3):
                 choose(submitted_problems)
             elif (choice == 4):
