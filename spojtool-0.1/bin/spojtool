@@ -92,15 +92,15 @@ def show_problems():
                     8 : read_from_user,
                     9 : sys.exit,
                 }
-        print ('\t\t1. Classical\n\
-                2. Challenge\n\
-                3. Partial\n\
-                4. Tutorial\n\
-                5. Riddle\n\
-                6. Basics\n\
-                7. Problem by tags\n\
-                8. Back\n\
-                9. Exit\n')
+        print ('1. Classical\n\
+2. Challenge\n\
+3. Partial\n\
+4. Tutorial\n\
+5. Riddle\n\
+6. Basics\n\
+7. Problem by tags\n\
+8. Back\n\
+9. Exit\n')
         try:
             choice = int(raw_input('Enter your choice[1-9](0 for back) : '))
             if (choice == 0):
@@ -135,14 +135,14 @@ def choices(link):
                      7 : '10',
                   }
 
-        print ('\t\t1. Sorted by ID\n\
-                2. Sorted by Name\n\
-                3. Sorted by Quality\n\
-                4. Sorted by Users\n\
-                5. Sorted by Accuracy\n\
-                6. Sorted by Concept Difficulty\n\
-                7. Sorted by Implementation Difficulty\n\
-                8. Exit\n')
+        print ('1. Sorted by ID\n\
+2. Sorted by Name\n\
+3. Sorted by Quality\n\
+4. Sorted by Users\n\
+5. Sorted by Accuracy\n\
+6. Sorted by Concept Difficulty\n\
+7. Sorted by Implementation Difficulty\n\
+8. Exit\n')
 
         choice = make_choice(8)
         if(choice == 0):
@@ -151,8 +151,8 @@ def choices(link):
             sys.exit()
 
         star()
-        print ('\t\t1. Increasing Order\n\
-                2. Decreasing Order\n')
+        print ('1. Increasing Order\n\
+2. Decreasing Order\n')
         ch = make_choice(2)
         star()
         urll = link + 'sort='
@@ -172,11 +172,11 @@ def list_problems(link, start = 0, last = False):
         star()
         try:
             if (start>0):
-                print ('-1. Last 50 problems')
-            print ('0. Back')
+                print ('       -1. | Last 50 problems')
+            print ('        0. | Back')
             if (not last):
-                print ('100. Next 50 problems')
-            print ('[1 : {} ]. For problem to open'.format(len(problems)))
+                print ('      100. | Next 50 problems')
+            print ('[1 : {} ]. | For problem to open'.format(len(problems)))
             choice = int(raw_input('Enter your choice : '))
 
             star()
@@ -187,14 +187,14 @@ def list_problems(link, start = 0, last = False):
             elif (choice == 100):
                 choice = list_problems(link, start+50)
             elif (choice != 0) :
-                open_problem(url + problems[choice - 1][-1], problems[choice - 1][1])
+                open_problem(url + problems[choice - 1][-1], problems[choice - 1])
             star()
 
             if (choice == 0):
                 return choice
 
         except ValueError:
-            print ('\t\t\t\tWrong Input!Try Again!')
+            print ('Wrong Input!Try Again!')
             star()
 
 def riddle_problems():
@@ -206,7 +206,7 @@ def riddle_problems():
         if (choice == 0):
             break
 
-        open_problem(url + problems_riddle[choice - 1][-1],problems_riddle[choice - 1][1])
+        open_problem(url + problems_riddle[choice - 1][-1],problems_riddle[choice - 1])
 
 def basic_problems():
     problems_basic = extract_problems(url + '/problems/basics/unsolved/')
@@ -217,7 +217,7 @@ def basic_problems():
         if (choice == 0):
             break
 
-        open_problem(url + problems_basic[choice - 1][-1], problems_basic[choice - 1][1])
+        open_problem(url + problems_basic[choice - 1][-1], problems_basic[choice - 1])
 
 def find_tags():
     soup = return_html(url + '/problems/tags')
@@ -250,7 +250,7 @@ def choose_tag(tags):
             if (choice == 0):
                 break
 
-            open_problem(url + tag_problems[choice - 1][-1], tag_problems[choice - 1][1])
+            open_problem(url + tag_problems[choice - 1][-1], tag_problems[choice - 1])
 
 def make_choice(l):
     try:
@@ -259,7 +259,9 @@ def make_choice(l):
         if (choice > l):
             raise ValueError
     except ValueError:
+        star()
         print ('Wrong Input!Enter Again!')
+        star()
         return make_choice(l)
 
     return choice
@@ -293,25 +295,57 @@ def extract_problems(link):
         problems.append((ind, name, quality, submissions, accuracy, implementation, concept, problem_link.get('href')))
     return problems
 
-def open_problem(link, name):
+def open_problem(link, tup):
     # Function that extracts problem statement, input description ,output description and test-cases
     print ('\n\n\n\n\n')
     star()
-    print ('Problem{:^120}'.format(name))
-    star()
-    #import webbrowser as wb
-    #wb.open_new(link)
-    soup = return_html(link)
-    statement = soup.find("div", {"id" : "problem-body"})
-    print (statement.get_text())
+    print ('{:^120}'.format('PROBLEM - ' + tup[1]))
     star()
 
-def return_html(link):
+    soup = return_html(link, True)
+    statement = soup.find("div", {"id" : "problem-body"})
+    print (statement.get_text())
+
+    options_after_open_problem(link, tup[-1].split('/')[-2])
+
+def options_after_open_problem(link, name):
+    while (True):
+        star()
+
+        print ('1. Open problem in webbrowser\n\
+2. Submit solution\n\
+3. My status\n\
+4. Problem Statistics\n\
+5. Exit\n')
+
+        choice = make_choice(5)
+        if(choice == 0):
+            break
+        elif (choice == 1):
+            import webbrowser
+            webbrowser.open_new(link)
+        elif (choice == 2):
+            submit_solution(url + '/submit/' + name + '/')
+        elif (choice == 4):
+            soup = return_html(url + '/ranks/' + name + '/')
+            stats = soup.find("table", {"class" : "table problems"}).find_all('tr')
+            star()
+            for head,cont in zip([h.get_text() for h in stats[0].find_all('th')] , [c.get_text() for c in stats[1].find_all('td')]):
+                print (head.encode('ascii') + " : " + cont.encode('ascii'))
+        else:
+            sys.exit()
+
+        star()
+
+
+def return_html(link, replace = False):
     r = session.get(link)
-    page_html = r.text.split('<br')
-    for i in range(1,len(page_html)):
-        page_html[i] = '\n\n<br' + page_html[i]
-    html = "".join(page_html)
+    html = r.text
+    if (replace):
+        page_html = r.text.split('<br')
+        for i in range(1,len(page_html)):
+            page_html[i] = '\n\n<br' + page_html[i]
+        html = "".join(page_html)
     soup = BeautifulSoup(html, 'html.parser')
     return soup
 
@@ -338,12 +372,12 @@ def read_from_user():
     while (True):
         star()
 
-        print ('\t\t1. Show problems\n\
-                2. Submit solution\n\
-                3. Show submitted problems by the user\n\
-                4. Show todo problems\n\
-                5. Download all solutions to submitted problems by user\n\
-                6. Exit\n')
+        print ('1. Show problems\n\
+2. Submit solution\n\
+3. Show submitted problems by the user\n\
+4. Show todo problems\n\
+5. Download all solutions to submitted problems by user\n\
+6. Exit\n')
         try:
             choice = int(raw_input('Enter your choice[1-6] : '))
             star()
