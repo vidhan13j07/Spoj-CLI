@@ -57,7 +57,7 @@ docs/_build/
 # PyBuilder
 target/
 
-spojtool-0.1/bin/.passd.txt
+spoj-cli-0.1/bin/.passd.txt
 
 venv/
 *~
