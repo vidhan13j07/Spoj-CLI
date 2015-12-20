@@ -305,8 +305,7 @@ def open_problem(link, tup):
     soup = return_html(link, True)
     statement = soup.find("div", {"id" : "problem-body"})
     print (statement.get_text())
-
-    options_after_open_problem(link, tup[-1].split('/')[-2])
+    options_after_open_problem(link, tup[-1].encode('ascii').rstrip('/').split('/')[-1])
 
 def options_after_open_problem(link, name):
     while (True):
