@@ -6,6 +6,7 @@ import os
 import re
 import bz2
 import requests
+import re
 from bs4 import BeautifulSoup
 
 global version
@@ -28,7 +29,8 @@ def first_time_login():
 
 def start_session(login_url, username, password):
     print ('Verifying....')
-    global session
+    global session, user
+    user = username
     with requests.Session() as session:
         payload = {
                 'login_user' : username,
@@ -295,17 +297,23 @@ def extract_problems(link):
         problems.append((ind, name, quality, submissions, accuracy, implementation, concept, problem_link.get('href')))
     return problems
 
-def open_problem(link, tup):
+def open_problem(link, tup, sizeis2 = True):
     # Function that extracts problem statement, input description ,output description and test-cases
     print ('\n\n\n\n\n')
     star()
-    print ('{:^120}'.format('PROBLEM - ' + tup[1]))
+    if (sizeis2):
+        print ('{:^130}'.format('PROBLEM - ' + tup[1]))
+    else:
+        print ('{:^140}'.format('PROBLEM - ' + tup[0]))
     star()
 
     soup = return_html(link, True)
     statement = soup.find("div", {"id" : "problem-body"})
     print (statement.get_text())
-    options_after_open_problem(link, tup[-1].encode('ascii').rstrip('/').split('/')[-1])
+    if (sizeis2):
+        options_after_open_problem(link, tup[-1].encode('ascii').rstrip('/').split('/')[-1])
+    else:
+        options_after_open_problem(link, tup[0])
 
 def options_after_open_problem(link, name):
     while (True):
@@ -324,7 +332,9 @@ def options_after_open_problem(link, name):
             import webbrowser
             webbrowser.open_new(link)
         elif (choice == 2):
-            submit_solution(url + '/submit/' + name + '/')
+            submit_solution(name)
+        elif (choice == 3):
+            my_status(url + '/status/' + name + ',' + user + '/')
         elif (choice == 4):
             soup = return_html(url + '/ranks/' + name + '/')
             stats = soup.find("table", {"class" : "table problems"}).find_all('tr')
@@ -336,6 +346,32 @@ def options_after_open_problem(link, name):
 
         star()
 
+def my_status(link):
+    soup = return_html(link)
+    submissions = []
+    rows = soup.find('table', {'class': 'problems'}).findAll('tr')
+    for ind,row in enumerate(rows):
+        if (ind == 0):
+            col = row.findAll('th')
+            sub_id = col[0].text
+            time = col[5].text
+        else:
+            col = row.findAll('td')
+            sub_id = col[0].find('a').text.strip()
+            time = col[5].find('a').text.strip()
+        date = col[2].text.strip()
+        name = (col[3].text).strip()
+        status = (col[4].text).replace('edit', '').replace('ideone it', '').strip()
+        mem = col[6].text.strip()
+        lang = col[7].text.strip()
+        submissions.append((sub_id, date, name, status, time, mem, lang))
+
+    submissions = submissions[1:]
+    star()
+    print ('{:^10}|{:^10}|{!s:^25s}|{!s:^30}|{!s:^30}|{!s:^10}|{!s:^10}|{!s:^15}\n'.format('INDEX', 'ID', 'DATE', 'NAME', 'RESULT', 'TIME',\
+            'MEM', 'LANG'))
+    for index,p in enumerate(submissions):
+        print ('{:^10}|{:^10}|{!s:^25s}|{!s:^30}|{!s:^30}|{!s:^10}|{!s:^10}|{!s:^15}'.format(index+1, p[0], p[1], p[2], p[3], p[4], p[5],p[6]))
 
 def return_html(link, replace = False):
     r = session.get(link)
@@ -348,7 +384,16 @@ def return_html(link, replace = False):
     soup = BeautifulSoup(html, 'html.parser')
     return soup
 
+def choose(tup):
+    while (True):
+        display(tup)
+        choice = make_choice(len(tup))
+        if (choice == 0):
+            break
+        open_problem(url + '/problems/' + tup[choice - 1][0] + '/', tup[choice - 1], False) 
+
 def display(tup):
+    print ('\n\t\t{:<30}||{:>30}\n'.format("INDEX", "PROBLEM"))
     for index,p in enumerate(tup):
         print ('\t\t{:<30}||{:>30}\n'.format(index+1, p[0]))
     star()
@@ -364,8 +409,13 @@ def display8(tup):
         print ('{:^10}|{:^10}|{!s:^55s}|{!s:^10}|{!s:^15}|{!s:^10}|{!s:^20}|{!s:^10}'.format(index+1, p[0], p[1], p[2], p[3], p[4], p[5],p[6]))
     star()
 
-def submit_solution():
-    pass
+def submit_solution(name):
+    link = url + '/submit/complete/'
+    filepath = raw_input('Enter the full path of the source code : ')
+    payload = dict(problemcode = name, lang ='4', file = open(filepath, 'rb').read(), submit = "Send")
+    r = session.post(link, data = payload)
+    sub_id = re.search(r'"newSubmissionId" value="(\d+)"/>', r.text).group(1)
+
 
 def read_from_user():
     while (True):
@@ -383,13 +433,12 @@ def read_from_user():
             if (choice == 1):
                 show_problems()
             elif (choice == 2):
-                submit_solution()
+                name = raw_input('Enter Problem Code : ')
+                submit_solution(name)
             elif (choice == 3):
-                print ('\n\t\t{:<30}||{:>30}\n'.format("INDEX", "PROBLEM"))
-                display(submitted_problems)
+                choose(submitted_problems)
             elif (choice == 4):
-                print ('\n\t\t{:<30}{:>30}\n'.format("INDEX", "PROBLEM"))
-                display(todo_problems)
+                choose(todo_problems)
             elif (choice == 6):
                 break
             else:
@@ -405,8 +454,7 @@ def star():
 def main():
     global url
     url = "http://www.spoj.com"
-    login_url = "http://www.spoj.com/login"
-    login_credentials(login_url)
+    login_credentials(url + '/login')
 
 if __name__ == '__main__':
     main()
