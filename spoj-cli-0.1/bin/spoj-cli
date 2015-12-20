@@ -258,7 +258,7 @@ def make_choice(l):
     try:
         choice = int(raw_input('Enter your choice[1 : {}] (0 for back) : '.format(l)))
         star()
-        if (choice > l):
+        if (choice < 0 or choice > l):
             raise ValueError
     except ValueError:
         star()
@@ -368,18 +368,43 @@ def my_status(link, check = False):
             sub_id = col[0].find('a').text.strip()
             time = col[5].find('a').text.strip()
         date = col[2].text.strip()
-        name = (col[3].text).strip()
-        status = (col[4].text).replace('edit', '').replace('ideone it', '').strip()
+        name = col[3].text.strip()
+        status = col[4].text.replace('edit', '').replace('ideone it', '').strip()
         mem = col[6].text.strip()
         lang = col[7].text.strip()
         submissions.append((sub_id, date, name, status, time, mem, lang))
 
     submissions = submissions[1:]
-    star()
-    print ('{:^10}|{:^10}|{!s:^25s}|{!s:^30}|{!s:^30}|{!s:^10}|{!s:^10}|{!s:^15}\n'.format('INDEX', 'ID', 'DATE', 'NAME', 'RESULT', 'TIME',\
-            'MEM', 'LANG'))
-    for index,p in enumerate(submissions):
-        print ('{:^10}|{:^10}|{!s:^25s}|{!s:^30}|{!s:^30}|{!s:^10}|{!s:^10}|{!s:^15}'.format(index+1, p[0], p[1], p[2], p[3], p[4], p[5],p[6]))
+
+    while (True):
+        star()
+        print ('{:^10}|{:^10}|{!s:^25s}|{!s:^30}|{!s:^30}|{!s:^10}|{!s:^10}|{!s:^15}\
+                \n'.format('INDEX', 'ID', 'DATE', 'NAME', 'RESULT', 'TIME','MEM', 'LANG'))
+        for index,p in enumerate(submissions):
+            print ('{:^10}|{:^10}|{!s:^25s}|{!s:^30}|{!s:^30}|{!s:^10}|{!s:^10}|{!s:^15}\
+                    '.format(index+1, p[0], p[1], p[2], p[3], p[4], p[5], p[6]))
+        star()
+        try:
+            choice = int(raw_input('Enter which solution to display[1 : {}] (0 for back) : '.format(len(submissions))))
+            star()
+            if(choice == 0):
+                break
+            elif (choice < 0 and choice > len(submissions)):
+                raise ValueError
+            else:
+                print ('\n\n\n\n')
+                star()
+                print ('{:^130}'.format('SOLUTION'))
+                star()
+                print (display_code(url + '/submit/' + link.split('/')[4].split(',')[0] + '/id=' + submissions[choice - 1][0]))
+        except ValueError:
+            star()
+            print ('Wrong Input!Enter Again!')
+            star()
+
+def display_code(link):
+    soup = return_html(link).find('textarea')
+    return soup.text
 
 def return_html(link, replace = False):
     r = session.get(link)
@@ -423,7 +448,7 @@ def submit_solution(name, ask_problem = False):
         try:
             if (ask_problem):
                 name = raw_input('Enter Problem Code : ')
-            filepath = raw_input('Enter the full path of the source code : ')
+            filepath = raw_input('Enter the path of the solution file : ')
             payload = dict(problemcode = name, lang ='4', file = open(filepath, 'rb').read(), submit = "Send")
             r = session.post(link, data = payload)
             sub_id = re.search(r'"newSubmissionId" value="(\d+)"/>', r.text).group(1)
