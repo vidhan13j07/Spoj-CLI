@@ -340,7 +340,10 @@ def options_after_open_problem(link, name):
             stats = soup.find("table", {"class" : "table problems"}).find_all('tr')
             star()
             for head,cont in zip([h.get_text() for h in stats[0].find_all('th')] , [c.get_text() for c in stats[1].find_all('td')]):
-                print (head.encode('ascii') + " : " + cont.encode('ascii'))
+                if (version):
+                    print (head.encode('ascii') + " : " + cont.encode('ascii'))
+                else:
+                    print (head + " : " + cont)
         else:
             sys.exit()
 
@@ -352,7 +355,7 @@ def my_status(link, check = False):
     if (check):
         col = rows[1].find_all('td')
         status = col[4].text.replace('edit', ' ').replace('ideone it', ' ').strip()
-        print " ".join(status.split("\n"))
+        print (" ".join(status.split("\n")))
         if (status.startswith('running') or status.startswith('compiling')):
             return False
         else:
@@ -457,7 +460,7 @@ def submit_solution(name, ask_problem = False):
             if (ask_problem):
                 name = raw_input('Enter Problem Code : ')
             filepath = raw_input('Enter the path of the solution file : ')
-            payload = dict(problemcode = name, lang ='4', file = open(filepath, 'rb').read(), submit = "Send")
+            payload = dict(problemcode = name, lang = language(name), file = open(filepath, 'rb').read(), submit = "Send")
             r = session.post(link, data = payload)
             sub_id = re.search(r'"newSubmissionId" value="(\d+)"/>', r.text).group(1)
         except AttributeError:
@@ -474,8 +477,31 @@ def submit_solution(name, ask_problem = False):
             break
     my_status(url + '/status/' + name + ',' + user + '/')
 
-def language():
-    pass
+def language(name):
+    link = url + '/submit/' + name + '/'
+    soup = return_html(link)
+    lang = soup.findAll('option')
+
+    options = dict()
+    for ind,option in enumerate(lang):
+        text = str(option)
+        options[ind] = ["".join(re.findall('<option.*?>(.*)</option>', text)), "".join(re.findall('^<option value="(.*)">', text))]
+
+    while (True):
+        star()
+        for key in options.keys():
+            print ('\t\t{:<20}||{:>40}\n'.format(key, options[key][0]))
+        try:
+            choice = int(raw_input("Choose the language[ 0 : {} ] :  ".format(len(options) - 1)))
+            if (choice < 0 or choice + 1 > len(options)):
+                raise ValueError
+        except ValueError:
+            print ('Wrong choice!Enter Again!\n')
+        else:
+            break
+
+    star()
+    return options[choice][1]
 
 def read_from_user():
     while (True):
