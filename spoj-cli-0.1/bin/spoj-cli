@@ -307,7 +307,7 @@ def open_problem(link, tup, sizeis2 = True):
         print ('{:^140}'.format('PROBLEM - ' + tup[0]))
     star()
 
-    soup = return_html(link, True)
+    soup = return_html(link + 'en/', True)
     statement = soup.find("div", {"id" : "problem-body"})
     print (statement.get_text())
     if (sizeis2):
@@ -375,6 +375,8 @@ def my_status(link, check = False):
         submissions.append((sub_id, date, name, status, time, mem, lang))
 
     submissions = submissions[1:]
+    if (len(submissions) == 0):
+        return
 
     while (True):
         star()
@@ -403,6 +405,7 @@ def my_status(link, check = False):
             star()
 
 def display_code(link):
+    #Function that extracts code submitted to the problem
     soup = str(session.get(link).text)
     return  "".join([x for x in re.findall('<textarea.*?>(.*)</textarea>', soup, re.MULTILINE | re.DOTALL)])
 
@@ -426,13 +429,16 @@ def choose(tup):
         open_problem(url + '/problems/' + tup[choice - 1][0] + '/', tup[choice - 1], False) 
 
 def display(tup):
-    if (len(tup) > 0):
-        print ('\n\t\t{:<30}||{:>30}\n'.format("INDEX", "PROBLEM"))
+    if (len(tup) == 0):
+        return
+    print ('\n\t\t{:<30}||{:>30}\n'.format("INDEX", "PROBLEM"))
     for index,p in enumerate(tup):
         print ('\t\t{:<30}||{:>30}\n'.format(index+1, p[0]))
     star()
 
 def display2(tup):
+    if (len(tup) == 0):
+        return
     for index,p in enumerate(tup):
         print ('{:<40}||{:^50}||{:>40}\n'.format(index+1 ,p[0] ,p[1]))
     star()
@@ -507,11 +513,10 @@ def read_from_user():
                     else:
                         break
 
+                star()
                 filter_list = [name[0] for name in submitted_problems]
                 problems = list(filter(lambda x: x[0] not in filter_list, problems))
                 choose(problems)
-
-                star()
             elif (choice == 7):
                 break
             else:
