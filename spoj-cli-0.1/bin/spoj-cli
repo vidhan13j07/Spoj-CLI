@@ -337,7 +337,7 @@ def options_after_open_problem(link, name):
             my_status(url + '/status/' + name + ',' + user + '/')
         elif (choice == 4):
             soup = return_html(url + '/ranks/' + name + '/')
-            stats = soup.find("table", {"class" : "table problems"}).find_all('tr')
+            stats = soup.find("table").find_all('tr')
             star()
             for head,cont in zip([h.get_text() for h in stats[0].find_all('th')] , [c.get_text() for c in stats[1].find_all('td')]):
                 if (version):
@@ -394,7 +394,7 @@ def my_status(link, check = False):
             star()
             if(choice == 0):
                 break
-            elif (choice < 0 and choice > len(submissions)):
+            elif (choice < 0 or choice > len(submissions)):
                 raise ValueError
             else:
                 print ('\n\n\n\n')
@@ -512,7 +512,7 @@ def read_from_user():
 3. Show submitted problems by the user\n\
 4. Show todo problems\n\
 5. Download all solutions to submitted problems by user\n\
-6. See problems submitted by some other user(Displays the problems submitted by other user and not by you)\n\
+6. See problems submitted by some other user(Displays only the problems AC\'d by other user)\n\
 7. Exit\n')
         try:
             choice = int(raw_input('Enter your choice[1-7] : '))
