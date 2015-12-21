@@ -315,19 +315,6 @@ def open_problem(link, tup, sizeis2 = True):
     else:
         options_after_open_problem(link, tup[0])
 
-def open_submitted_problem(link, name):
-    # Function that extracts problem statement, input description ,output description and test-cases
-    print ('\n\n\n\n\n')
-    soup = return_html(link, True)
-    statement = soup.find("div", {"id" : "problem-body"})
-    prob = soup.find("h2",{"id" : "problem-name"})
-    star()
-    print ('{:^120}'.format('PROBLEM - ' + prob.get_text()))
-    star()
-
-    print (statement.get_text())
-    options_after_open_problem(link, name)
-
 def options_after_open_problem(link, name):
     while (True):
         star()
@@ -467,13 +454,15 @@ def submit_solution(name, ask_problem = False):
             payload = dict(problemcode = name, lang ='4', file = open(filepath, 'rb').read(), submit = "Send")
             r = session.post(link, data = payload)
             sub_id = re.search(r'"newSubmissionId" value="(\d+)"/>', r.text).group(1)
-            break
         except AttributeError:
             print ('Wrong ProblemCode!Enter Again!')
             star()
         except IOError:
             print ("FilePath is not valid!Enter Again!")
             star()
+        else:
+            break
+
     while (True):
         if (my_status(url + '/status/' + name + ',' + user + '/', True)):
             break
@@ -491,7 +480,7 @@ def read_from_user():
 3. Show submitted problems by the user\n\
 4. Show todo problems\n\
 5. Download all solutions to submitted problems by user\n\
-6. See problems submitted by some other user\n\
+6. See problems submitted by some other user(Displays the problems submitted by other user and not by you)\n\
 7. Exit\n')
         try:
             choice = int(raw_input('Enter your choice[1-7] : '))
@@ -504,20 +493,25 @@ def read_from_user():
                 choose(submitted_problems)
             elif (choice == 4):
                 choose(todo_problems)
-	    elif (choice == 6):
-		frnd = raw_input("Enter username: ")
-                urlf = url + '/users/' + frnd + '/'
-                soup = return_html(urlf)
-                submitted = soup.find('table')
-                problems = read_problems(submitted)
-                display(problems)
-                choice = int(raw_input('Enter your choice [1 - {}](0 for back): '.format(len(problems))))
-                try:
-                    open_submitted_problem(url + '/problems/' + problems[choice - 1][0], problems[choice -1][0])
-                    star()
-                except ValueError:
-                    print ('Wrong Input!Try Again!')
-                    star()
+            elif (choice == 6):
+                while (True):
+                    try:
+                        frnd_name = raw_input("Enter username: ")
+                        table = return_html(url + '/users/' + frnd_name + '/').find('table')
+                        problems = read_problems(table)
+                        if (len(problems) == 0):
+                            raise AttributeError
+                    except AttributeError:
+                        print ('Username is not valid!Enter again!')
+                        star()
+                    else:
+                        break
+
+                filter_list = [name[0] for name in submitted_problems]
+                problems = list(filter(lambda x: x[0] not in filter_list, problems))
+                choose(problems)
+
+                star()
             elif (choice == 7):
                 break
             else:
