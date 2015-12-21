@@ -1,4 +1,4 @@
-#Spoj-toolkit  [![Build Status](https://travis-ci.org/vidhan13j07/Spoj-toolkit.svg?branch=master)](https://travis-ci.org/vidhan13j07/Spoj-toolkit)
+#Spoj-CLI  [![Build Status](https://travis-ci.org/vidhan13j07/Spoj-CLI.svg?branch=master)](https://travis-ci.org/vidhan13j07/Spoj-CLI)
 A command line tool to read the problems and submit solutions directly through terminal.
 
 ##The MIT License (MIT)
