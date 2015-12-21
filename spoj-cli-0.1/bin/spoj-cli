@@ -403,8 +403,8 @@ def my_status(link, check = False):
             star()
 
 def display_code(link):
-    soup = return_html(link).find('textarea')
-    return soup.text
+    soup = str(session.get(link).text)
+    return  "".join([x for x in re.findall('<textarea.*?>(.*)</textarea>', soup, re.MULTILINE | re.DOTALL)])
 
 def return_html(link, replace = False):
     r = session.get(link)
@@ -426,7 +426,8 @@ def choose(tup):
         open_problem(url + '/problems/' + tup[choice - 1][0] + '/', tup[choice - 1], False) 
 
 def display(tup):
-    print ('\n\t\t{:<30}||{:>30}\n'.format("INDEX", "PROBLEM"))
+    if (len(tup) > 0):
+        print ('\n\t\t{:<30}||{:>30}\n'.format("INDEX", "PROBLEM"))
     for index,p in enumerate(tup):
         print ('\t\t{:<30}||{:>30}\n'.format(index+1, p[0]))
     star()
@@ -437,7 +438,8 @@ def display2(tup):
     star()
 
 def display8(tup):
-    print ('{:^10}|{:^10}|{:^55}|{:^10}|{:^15}|{:^10}|{:^20}|{:^10}\n'.format("NUMBER", "ID", "NAME", "QUALITY", "USERS", "ACCURACY", "IMPLEMENTATION", "CONCEPT"))
+    if (len(tup) > 0):
+        print ('{:^10}|{:^10}|{:^55}|{:^10}|{:^15}|{:^10}|{:^20}|{:^10}\n'.format("NUMBER", "ID", "NAME", "QUALITY", "USERS", "ACCURACY", "IMPLEMENTATION", "CONCEPT"))
     for index,p in enumerate(tup):
         print ('{:^10}|{:^10}|{!s:^55s}|{!s:^10}|{!s:^15}|{!s:^10}|{!s:^20}|{!s:^10}'.format(index+1, p[0], p[1], p[2], p[3], p[4], p[5],p[6]))
     star()
@@ -463,6 +465,9 @@ def submit_solution(name, ask_problem = False):
         if (my_status(url + '/status/' + name + ',' + user + '/', True)):
             break
     my_status(url + '/status/' + name + ',' + user + '/')
+
+def language():
+    pass
 
 def read_from_user():
     while (True):
