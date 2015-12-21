@@ -293,7 +293,8 @@ def extract_problems(link):
         name = problem_link.get_text().strip()
         if (version):
             name = name.encode('utf-8')
-
+        if (ind == '6681'):
+            name = "".join(re.findall("[a-zA-Z]+", name))
         problems.append((ind, name, quality, submissions, accuracy, implementation, concept, problem_link.get('href')))
     return problems
 
@@ -337,13 +338,16 @@ def options_after_open_problem(link, name):
             my_status(url + '/status/' + name + ',' + user + '/')
         elif (choice == 4):
             soup = return_html(url + '/ranks/' + name + '/')
-            stats = soup.find("table").find_all('tr')
-            star()
-            for head,cont in zip([h.get_text() for h in stats[0].find_all('th')] , [c.get_text() for c in stats[1].find_all('td')]):
-                if (version):
-                    print (head.encode('ascii') + " : " + cont.encode('ascii'))
-                else:
-                    print (head + " : " + cont)
+            try:
+                stats = soup.find("table").find_all('tr')
+                star()
+                for head,cont in zip([h.get_text() for h in stats[0].find_all('th')] , [c.get_text() for c in stats[1].find_all('td')]):
+                    if (version):
+                        print (head.encode('ascii') + " : " + cont.encode('ascii'))
+                    else:
+                        print (head + " : " + cont)
+            except AttributeError:
+                print ('Sorry request cannot be processed. Server is busy.')
         else:
             sys.exit()
 
@@ -460,6 +464,8 @@ def submit_solution(name, ask_problem = False):
             if (ask_problem):
                 name = raw_input('Enter Problem Code : ')
             filepath = raw_input('Enter the path of the solution file : ')
+            if (not os.path.isfile(filepath)):
+                raise IOError
             payload = dict(problemcode = name, lang = language(name), file = open(filepath, 'rb').read(), submit = "Send")
             r = session.post(link, data = payload)
             sub_id = re.search(r'"newSubmissionId" value="(\d+)"/>', r.text).group(1)
@@ -487,6 +493,9 @@ def language(name):
         text = str(option)
         options[ind] = ["".join(re.findall('<option.*?>(.*)</option>', text)), "".join(re.findall('^<option value="(.*)">', text))]
 
+    if (len(options) == 0):
+        return '0'
+
     while (True):
         star()
         for key in options.keys():
@@ -503,6 +512,9 @@ def language(name):
     star()
     return options[choice][1]
 
+def download_solutions():
+    pass
+
 def read_from_user():
     while (True):
         star()
@@ -511,7 +523,7 @@ def read_from_user():
 2. Submit solution\n\
 3. Show submitted problems by the user\n\
 4. Show todo problems\n\
-5. Download all solutions to submitted problems by user\n\
+5. Download all solutions to AC problems by user\n\
 6. See problems submitted by some other user(Displays only the problems AC\'d by other user)\n\
 7. Exit\n')
         try:
@@ -525,6 +537,8 @@ def read_from_user():
                 choose(submitted_problems)
             elif (choice == 4):
                 choose(todo_problems)
+            elif (choice == 5):
+                download_solutions()
             elif (choice == 6):
                 while (True):
                     try:
