@@ -315,6 +315,19 @@ def open_problem(link, tup, sizeis2 = True):
     else:
         options_after_open_problem(link, tup[0])
 
+def open_submitted_problem(link, name):
+    # Function that extracts problem statement, input description ,output description and test-cases
+    print ('\n\n\n\n\n')
+    soup = return_html(link, True)
+    statement = soup.find("div", {"id" : "problem-body"})
+    prob = soup.find("h2",{"id" : "problem-name"})
+    star()
+    print ('{:^120}'.format('PROBLEM - ' + prob.get_text()))
+    star()
+
+    print (statement.get_text())
+    options_after_open_problem(link, name)
+
 def options_after_open_problem(link, name):
     while (True):
         star()
@@ -478,9 +491,10 @@ def read_from_user():
 3. Show submitted problems by the user\n\
 4. Show todo problems\n\
 5. Download all solutions to submitted problems by user\n\
-6. Exit\n')
+6. See problems submitted by some other user\n\
+7. Exit\n')
         try:
-            choice = int(raw_input('Enter your choice[1-6] : '))
+            choice = int(raw_input('Enter your choice[1-7] : '))
             star()
             if (choice == 1):
                 show_problems()
@@ -490,7 +504,21 @@ def read_from_user():
                 choose(submitted_problems)
             elif (choice == 4):
                 choose(todo_problems)
-            elif (choice == 6):
+	    elif (choice == 6):
+		frnd = raw_input("Enter username: ")
+                urlf = url + '/users/' + frnd + '/'
+                soup = return_html(urlf)
+                submitted = soup.find('table')
+                problems = read_problems(submitted)
+                display(problems)
+                choice = int(raw_input('Enter your choice [1 - {}](0 for back): '.format(len(problems))))
+                try:
+                    open_submitted_problem(url + '/problems/' + problems[choice - 1][0], problems[choice -1][0])
+                    star()
+                except ValueError:
+                    print ('Wrong Input!Try Again!')
+                    star()
+            elif (choice == 7):
                 break
             else:
                 raise ValueError
