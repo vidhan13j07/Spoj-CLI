@@ -309,7 +309,7 @@ def open_problem(link, tup, sizeis2 = True):
     problem_meta = soup.find("table", {"id" : "problem-meta"}).find_all('tr')
     for row in problem_meta:
         col = row.find_all('td')
-        print col[0].get_text() + " : " + col[1].get_text()
+        print (col[0].get_text() + " : " + col[1].get_text())
     if (sizeis2):
         options_after_open_problem(link, tup[-1].encode('ascii').rstrip('/').split('/')[-1])
     else:
