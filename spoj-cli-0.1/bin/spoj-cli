@@ -299,7 +299,7 @@ def open_problem(link, tup, sizeis2 = True):
     soup = return_html(link + 'en/', True)
 
     problem_name = soup.find("h2", {"id" : "problem-name"}).get_text()
-    print ('{:^130}'.format('PROBLEM - ' + problem_name))
+    print ('{:^130}'.format(problem_name))
     star()
 
     statement = soup.find("div", {"id" : "problem-body"})
