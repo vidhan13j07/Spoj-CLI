@@ -4,7 +4,6 @@ import sys
 import getpass
 import os
 import re
-import bz2
 import requests
 import re
 from bs4 import BeautifulSoup
@@ -16,16 +15,12 @@ if (sys.version_info > (3,0)):
 else:
     version = True
 
-def first_time_login():
+def login(login_url):
+    star()
     name = raw_input("Enter your spoj username: ")
     password = getpass.getpass()
-    # When the user logins for the first time, his username and password gets stored in the file in encrypted format.
-    # On next login, this username and password is retrieved from file and used.
-    compressed = bz2.compress((name + ',' + password).encode('utf-8'))
-    with open('.passd.txt', 'wb') as f:
-        f.write(compressed)
-    return name,password
-
+    star()
+    start_session(login_url, name, password)
 
 def start_session(login_url, username, password):
     print ('Verifying....')
@@ -50,8 +45,7 @@ def start_session(login_url, username, password):
             if (auth.get_text() == 'Authentication failed!'):
                 print ('Authentication Failed!')
                 print ('Enter login credentials again!')
-                name,p = first_time_login()
-                start_session(url, name, p)
+                login(login_url)
                 break
         else:
             soup = return_html('http://www.spoj.com/myaccount/')
@@ -252,7 +246,7 @@ def choose_tag(tags):
             if (choice == 0):
                 break
 
-            open_problem(url + tag_problems[choice - 1][-1], tag_problems[choice - 1])
+            open_problem(url + tag_problems[choice - 1][-1] + '/', tag_problems[choice - 1])
 
 def make_choice(l):
     try:
@@ -307,7 +301,6 @@ def open_problem(link, tup, sizeis2 = True):
     else:
         print ('{:^140}'.format('PROBLEM - ' + tup[0]))
     star()
-
     soup = return_html(link + 'en/', True)
     statement = soup.find("div", {"id" : "problem-body"})
     print (statement.get_text())
@@ -595,7 +588,9 @@ def star():
 def main():
     global url
     url = "http://www.spoj.com"
-    login_credentials(url + '/login')
+    star()
+    print ('\t\t\t\t\t\t\tFull Screen Recommended')
+    login(url + '/login')
 
 if __name__ == '__main__':
     main()
