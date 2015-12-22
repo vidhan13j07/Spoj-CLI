@@ -28,7 +28,7 @@ $ sudo pip3 install spoj-cli
 
 ```bash
 $ git clone https://github.com/vidhan13j07/Spoj-CLI.git && cd spoj-cli-0.1
-$ python setup.py install
+$ sudo python setup.py install
 ```
 #Upgrading the Spoj-CLI using [Pip](http://pip.readthedocs.org/en/stable/installing/)
 
