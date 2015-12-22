@@ -1,5 +1,34 @@
 #Spoj-CLI  [![Build Status](https://travis-ci.org/vidhan13j07/Spoj-CLI.svg?branch=master)](https://travis-ci.org/vidhan13j07/Spoj-CLI)
-A command line tool to read the problems and submit solutions directly through terminal.
+
+A command line tool to search,view and submit solutions to the problems directly through terminal.
+
+
+
+#Features
+* Various categories of problems like classical, challenge, partial, tutorial, riddle, basics and problem by tags.
+* Problems sorted by ID, Name, Quality, Users, Accuracy, Concept and Implementation Difficulty.
+* Open problem in the browser or display problem-body in terminal.
+* Submit solution.
+* Show the AC problems and todo problems of the user.
+* Download all AC solutions by the user.
+* Show all the problems submitted by some other user.
+
+
+
+#Contributing
+1. Fork it
+2. Create your branch: ``` git checkout -b my-new-feature ```
+3. Commit your changes: ``` git commit -m 'Add some feature' ```
+4. Push to the branch: ``` git push origin my-new-feature ```
+5. Send a pull request :D
+
+
+
+#Requirements
+1. BeautifulSoup
+
+
+
 
 ##The MIT License (MIT)
 >Copyright (c) 2015 Vidhan Jain
