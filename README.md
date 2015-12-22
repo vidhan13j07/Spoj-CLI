@@ -13,7 +13,16 @@ A command line tool to search,view and submit solutions to the problems directly
 * Download all AC solutions by the user.
 * Show all the problems submitted by some other user.
 
+#Screenshots
+![ScreenShot](https://raw.github.com/vidhan13j07/Spoj-CLI/master/Screenshots/1.png)
+![ScreenShot](https://raw.github.com/vidhan13j07/Spoj-CLI/master/Screenshots/2.png)
+![ScreenShot](https://raw.github.com/vidhan13j07/Spoj-CLI/master/Screenshots/10.png)
+![ScreenShot](https://raw.github.com/vidhan13j07/Spoj-CLI/master/Screenshots/11.png)
+![ScreenShot](https://raw.github.com/vidhan13j07/Spoj-CLI/master/Screenshots/12.png)
+![ScreenShot](https://raw.github.com/vidhan13j07/Spoj-CLI/master/Screenshots/19.png)
+![ScreenShot](https://raw.github.com/vidhan13j07/Spoj-CLI/master/Screenshots/20.png)
 
+![ScreenShot](https://raw.github.com/vidhan13j07/Spoj-CLI/master/Screenshots/6.png)
 
 #Contributing
 1. Fork it
