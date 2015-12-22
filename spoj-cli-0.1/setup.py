@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup ( name = 'spoj-cli',
-        version = '1.0',
+        version = '1.1',
         description = 'View and submit solutions to the www.spoj.com using commandline',
         url = 'https://github.com/vidhan13j07/Spoj-toolkit',
         author = 'Vidhan Jain',
