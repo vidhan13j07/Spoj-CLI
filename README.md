@@ -21,7 +21,7 @@ $ sudo pip install spoj-cli
 For Python 3.4
 
 ```bash
-$ sudo pip3 install instantmusic
+$ sudo pip3 install spoj-cli
 ```
 
 ##OR
@@ -41,7 +41,7 @@ $ sudo pip install --upgrade spoj-cli
 For Python 3.4
 
 ```bash
-$ sudo pip3 install --upgrade instantmusic
+$ sudo pip3 install --upgrade spoj-cli
 ```
 
 ##Usage
