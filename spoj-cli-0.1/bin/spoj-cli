@@ -78,7 +78,7 @@ def read_problems(table):
         for col in row.find_all('a'):
             problems.append((col.get_text(), col.get('href')))
     # Strip out empty tuples
-    return list(filter(lambda x: x[0], problems))
+    return sorted(list(filter(lambda x: x[0], problems)))
 
 def show_problems():
     while (True):
@@ -353,8 +353,10 @@ def options_after_open_problem(link, name):
 
         star()
 
-def my_status(link, check = False):
-    soup = return_html(link)
+def my_status(link, check = False, accepted = False):
+    r = session.get(link)
+    html = r.text.encode('utf-8').replace('</td></td>', '</td>')
+    soup = BeautifulSoup(html, 'html.parser')
     rows = soup.find('table', {'class': 'problems'}).findAll('tr')
     if (check):
         col = rows[1].find_all('td')
@@ -371,9 +373,12 @@ def my_status(link, check = False):
             sub_id = col[0].text
             time = col[5].text
         else:
-            col = row.findAll('td')
-            sub_id = col[0].find('a').text.strip()
-            time = col[5].find('a').text.strip()
+            try:
+                col = row.findAll('td')
+                sub_id = col[0].find('a').text.strip()
+                time = col[5].find('a').text.strip()
+            except IndexError:
+                return
         date = col[2].text.strip()
         name = col[3].text.strip()
         status = col[4].text.replace('edit', '').replace('ideone it', '').strip()
@@ -382,6 +387,8 @@ def my_status(link, check = False):
         submissions.append((sub_id, date, name, status, time, mem, lang))
 
     submissions = submissions[1:]
+    if (accepted):
+        return [x[0] for x in submissions if x[3] == 'accepted']
     if (len(submissions) == 0):
         return
 
@@ -479,7 +486,7 @@ def submit_solution(name, ask_problem = False):
             break
 
     while (True):
-        if (my_status(url + '/status/' + name + ',' + user + '/', True)):
+        if (my_status(url + '/status/' + name + ',' + user + '/', check = True)):
             break
     my_status(url + '/status/' + name + ',' + user + '/')
 
@@ -513,7 +520,23 @@ def language(name):
     return options[choice][1]
 
 def download_solutions():
-    pass
+    try:
+        path = raw_input('Enter the directory to store solutions : ')
+        if (not os.path.exists(path)):
+            os.mkdir(path)
+        if (not os.path.isdir(path)):
+            raise RuntimeError
+    except Exception as e:
+        print (e)
+        sys.exit(1)
+    os.chdir(path)
+    for problem in [x[0] for x in submitted_problems]:
+        print ('Downloading solutions of ' + problem)
+        for sol_id in my_status(url + '/status/' + problem + "," + user + '/', accepted = True):
+            filename = problem + "-" + sol_id
+            code = display_code(url + '/submit/' + problem + '/id=' + sol_id)
+            with open(filename, 'w') as f:
+                f.write(code)
 
 def read_from_user():
     while (True):
