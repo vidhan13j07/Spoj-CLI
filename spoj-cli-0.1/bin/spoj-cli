@@ -296,14 +296,20 @@ def open_problem(link, tup, sizeis2 = True):
     # Function that extracts problem statement, input description ,output description and test-cases
     print ('\n\n\n\n\n')
     star()
-    if (sizeis2):
-        print ('{:^130}'.format('PROBLEM - ' + tup[1]))
-    else:
-        print ('{:^140}'.format('PROBLEM - ' + tup[0]))
-    star()
     soup = return_html(link + 'en/', True)
+
+    problem_name = soup.find("h2", {"id" : "problem-name"}).get_text()
+    print ('{:^130}'.format('PROBLEM - ' + problem_name))
+    star()
+
     statement = soup.find("div", {"id" : "problem-body"})
     print (statement.get_text())
+    star()
+
+    problem_meta = soup.find("table", {"id" : "problem-meta"}).find_all('tr')
+    for row in problem_meta:
+        col = row.find_all('td')
+        print col[0].get_text() + " : " + col[1].get_text()
     if (sizeis2):
         options_after_open_problem(link, tup[-1].encode('ascii').rstrip('/').split('/')[-1])
     else:
