@@ -56,15 +56,6 @@ def start_session(login_url, username, password):
 
             read_from_user()
 
-def login_credentials(login_url):
-    if (os.path.isfile('.passd.txt')):
-        with open('.passd.txt','rb') as f:
-            username,password = bz2.decompress(f.read()).decode('utf-8').split(',')
-    else:
-        username,password = first_time_login()
-
-    start_session(login_url, username, password)
-
 def read_problems(table):
     # function to read all submiited problems and todo problems
     problems = []
