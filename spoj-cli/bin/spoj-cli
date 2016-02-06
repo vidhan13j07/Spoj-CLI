@@ -287,8 +287,10 @@ def open_problem(link, tup, sizeis2 = True):
     # Function that extracts problem statement, input description ,output description and test-cases
     print ('\n\n\n\n\n')
     star()
-    soup = return_html(link + 'en/', True)
-
+    if (link.endswith('/')):
+        soup = return_html(link + 'en/', True)
+    else:
+        soup = return_html(link + '/en/', True)
     problem_name = soup.find("h2", {"id" : "problem-name"}).get_text()
     print ('{:^130}'.format(problem_name))
     star()
