@@ -1,4 +1,4 @@
-#Spoj-CLI  [![Build Status](https://travis-ci.org/vidhan13j07/Spoj-CLI.svg?branch=master)](https://travis-ci.org/vidhan13j07/Spoj-CLI)  [![PyPI](https://img.shields.io/pypi/v/spoj-cli.svg)](https://pypi.python.org/pypi/spoj-cli/1.1) [![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://github.com/vidhan13j07/Spoj-CLI)
+#Spoj-CLI  [![Build Status](https://travis-ci.org/vidhan13j07/Spoj-CLI.svg?branch=master)](https://travis-ci.org/vidhan13j07/Spoj-CLI)  [![PyPI](https://img.shields.io/pypi/v/spoj-cli.svg)](https://pypi.python.org/pypi/spoj-cli/1.2) [![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://github.com/vidhan13j07/Spoj-CLI)
 
 A command line tool to search,view and submit solutions to the problems directly through terminal.
 
